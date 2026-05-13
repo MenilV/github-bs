@@ -168,37 +168,52 @@
   }
 
   function injectWidgets() {
-    if (document.getElementById('ghbs-overlay')) return;
+    const sidebar = document.querySelector('.dashboard-sidebar, [data-testid="dashboard-sidebar"]');
+    const newsFeed = document.querySelector('.news, [data-testid="dashboard-feed"]');
 
-    const overlay = el('div', 'ghbs-overlay');
-    overlay.id = 'ghbs-overlay';
+    if (!sidebar && !newsFeed) {
+      log('Sidebar or News Feed not found, skipping widget injection');
+      return;
+    }
 
-    const leftPanel = el('div', 'ghbs-panel-left');
-    leftPanel.id = 'ghbs-left-panel';
-    leftPanel.appendChild(buildWeatherWidget());
-    leftPanel.appendChild(buildQuoteCard());
+    // --- Sidebar Injection (Stats, Status, Trending) ---
+    if (sidebar && !document.querySelector('.ghbs-sidebar-widgets')) {
+      const sidebarContainer = el('div', 'ghbs-sidebar-widgets');
+      sidebarContainer.appendChild(buildChartWidget());
+      sidebarContainer.appendChild(buildStatusBox());
+      sidebarContainer.appendChild(buildTrendingWidget());
+      
+      const repoList = sidebar.querySelector('.filter-list, [data-testid="dashboard-repos"]');
+      if (repoList) {
+        repoList.parentNode.insertBefore(sidebarContainer, repoList.nextSibling);
+      } else {
+        sidebar.appendChild(sidebarContainer);
+      }
+    }
 
-    const rightPanel = el('div', 'ghbs-panel-right');
-    rightPanel.id = 'ghbs-right-panel';
-    rightPanel.appendChild(buildChartWidget());
-    rightPanel.appendChild(buildStatusBox());
-    rightPanel.appendChild(buildStickyNote());
-    rightPanel.appendChild(buildTrendingWidget());
+    // --- Main Feed Injection (Welcome, Weather, Proverbs) ---
+    if (newsFeed && !document.querySelector('.ghbs-feed-widgets')) {
+      const feedContainer = el('div', 'ghbs-feed-widgets');
+      feedContainer.appendChild(buildWelcomeBanner());
 
-    const welcomeBanner = buildWelcomeBanner();
-    welcomeBanner.id = 'ghbs-welcome-banner';
+      const topGrid = el('div', 'ghbs-widgets-grid');
+      topGrid.appendChild(buildWeatherWidget());
+      topGrid.appendChild(buildQuoteCard());
+      topGrid.appendChild(buildQuoteCard()); // Second proverb widget
+      
+      feedContainer.appendChild(topGrid);
+      newsFeed.prepend(feedContainer);
+    }
 
-    const footer = buildFooter();
-    footer.id = 'ghbs-footer';
+    // --- Footer Injection ---
+    if (!document.querySelector('.ghbs-footer')) {
+      const main = document.querySelector('main, .application-main');
+      if (main) {
+        main.appendChild(buildFooter());
+      }
+    }
 
-    overlay.appendChild(leftPanel);
-    overlay.appendChild(rightPanel);
-    overlay.appendChild(welcomeBanner);
-    overlay.appendChild(footer);
-
-    document.body.appendChild(overlay);
-
-    log('Widgets injected');
+    log('Widgets integrated into DOM');
   }
 
   function localizeUI() {
@@ -342,16 +357,9 @@
   }
 
   function scanAndInject() {
-    const layout = {
-      hasSidebar: !!document.querySelector('.dashboard-sidebar, [data-testid="dashboard-sidebar"]'),
-      hasNewsFeed: !!document.querySelector('.news, [data-testid="dashboard-feed"]'),
-      hasRepoList: !!document.querySelector('[data-testid="dashboard-repos"], .dashboard-sidebar .filter-list'),
-      headerHeight: document.querySelector('header')?.offsetHeight || 64,
-      mainWidth: document.querySelector('main, .application-main')?.offsetWidth || window.innerWidth,
-    };
-    log('Layout scan:', layout);
     injectWidgets();
   }
+
 
   async function applySkin() {
     try {

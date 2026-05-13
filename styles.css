@@ -151,75 +151,52 @@ body.ghbs-active .ghbs-topbar .avatar-user {
   border-radius: 50%;
 }
 
-/* ── Overlay Container ── */
+/* ── Widget Integration ── */
 
-body.ghbs-active .ghbs-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 9999 !important;
-  pointer-events: none !important;
-}
-
-body.ghbs-active .ghbs-overlay > * {
-  pointer-events: auto !important;
-}
-
-/* ── Left Panel ── */
-
-body.ghbs-active .ghbs-panel-left {
-  position: fixed !important;
-  left: var(--ghbs-panel-gap) !important;
-  top: calc(var(--ghbs-header-height) + var(--ghbs-panel-gap)) !important;
-  width: var(--ghbs-panel-width) !important;
-  max-height: calc(100vh - var(--ghbs-header-height) - var(--ghbs-panel-gap) * 2) !important;
-  overflow-y: auto !important;
+.ghbs-sidebar-widgets {
   display: flex !important;
   flex-direction: column !important;
   gap: 12px !important;
-  padding-bottom: 20px !important;
-  z-index: 10000 !important;
+  margin-top: 24px !important;
 }
 
-/* ── Right Panel ── */
-
-body.ghbs-active .ghbs-panel-right {
-  position: fixed !important;
-  right: var(--ghbs-panel-gap) !important;
-  top: calc(var(--ghbs-header-height) + var(--ghbs-panel-gap)) !important;
-  width: var(--ghbs-panel-width) !important;
-  max-height: calc(100vh - var(--ghbs-header-height) - var(--ghbs-panel-gap) * 2) !important;
-  overflow-y: auto !important;
+.ghbs-feed-widgets {
   display: flex !important;
   flex-direction: column !important;
+  gap: 16px !important;
+  margin-bottom: 24px !important;
+}
+
+.ghbs-widgets-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
   gap: 12px !important;
-  padding-bottom: 20px !important;
-  z-index: 10000 !important;
 }
 
-/* ── Welcome Banner ── */
+/* ── Overrides for Integration ── */
 
-body.ghbs-active #ghbs-welcome-banner {
-  position: fixed !important;
-  left: calc(var(--ghbs-panel-width) + var(--ghbs-panel-gap) * 2) !important;
-  right: calc(var(--ghbs-panel-width) + var(--ghbs-panel-gap) * 2) !important;
-  top: calc(var(--ghbs-header-height) + var(--ghbs-panel-gap)) !important;
-  z-index: 10000 !important;
-  max-width: 700px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+.ghbs-card {
+  margin-bottom: 0 !important; /* Managed by container gap */
 }
 
-/* ── Footer ── */
+#ghbs-welcome-banner {
+  position: static !important;
+  max-width: none !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
 
-body.ghbs-active #ghbs-footer {
-  position: fixed !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  background: var(--ghbs-bg-alt) !important;
+.ghbs-footer {
+  position: static !important;
+  margin-top: 40px !important;
+  width: 100% !important;
+  background: transparent !important;
   border-top: 1px solid var(--ghbs-border) !important;
-  z-index: 10000 !important;
 }
+
+/* ── Removed Fixed Panels ── */
+
+/* (We keep the card styles but remove the fixed positioning of containers) */
 
 body.ghbs-active .ghbs-footer-inner {
   max-width: 1440px;
