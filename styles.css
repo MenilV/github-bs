@@ -167,7 +167,7 @@ body.ghbs-active .ghbs-overlay > * {
 /* ── Left Panel ── */
 
 body.ghbs-active .ghbs-panel-left {
-  position: absolute !important;
+  position: fixed !important;
   left: var(--ghbs-panel-gap) !important;
   top: calc(var(--ghbs-header-height) + var(--ghbs-panel-gap)) !important;
   width: var(--ghbs-panel-width) !important;
@@ -177,12 +177,13 @@ body.ghbs-active .ghbs-panel-left {
   flex-direction: column !important;
   gap: 12px !important;
   padding-bottom: 20px !important;
+  z-index: 10000 !important;
 }
 
 /* ── Right Panel ── */
 
 body.ghbs-active .ghbs-panel-right {
-  position: absolute !important;
+  position: fixed !important;
   right: var(--ghbs-panel-gap) !important;
   top: calc(var(--ghbs-header-height) + var(--ghbs-panel-gap)) !important;
   width: var(--ghbs-panel-width) !important;
@@ -192,26 +193,29 @@ body.ghbs-active .ghbs-panel-right {
   flex-direction: column !important;
   gap: 12px !important;
   padding-bottom: 20px !important;
+  z-index: 10000 !important;
 }
 
 /* ── Welcome Banner ── */
 
 body.ghbs-active #ghbs-welcome-banner {
-  position: absolute !important;
+  position: fixed !important;
   left: calc(var(--ghbs-panel-width) + var(--ghbs-panel-gap) * 2) !important;
   right: calc(var(--ghbs-panel-width) + var(--ghbs-panel-gap) * 2) !important;
   top: calc(var(--ghbs-header-height) + var(--ghbs-panel-gap)) !important;
+  z-index: 10000 !important;
 }
 
 /* ── Footer ── */
 
 body.ghbs-active #ghbs-footer {
-  position: absolute !important;
+  position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
   background: var(--ghbs-bg-alt) !important;
   border-top: 1px solid var(--ghbs-border) !important;
+  z-index: 10000 !important;
 }
 
 body.ghbs-active .ghbs-footer-inner {
