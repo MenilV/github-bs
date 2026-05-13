@@ -204,6 +204,9 @@ body.ghbs-active #ghbs-welcome-banner {
   right: calc(var(--ghbs-panel-width) + var(--ghbs-panel-gap) * 2) !important;
   top: calc(var(--ghbs-header-height) + var(--ghbs-panel-gap)) !important;
   z-index: 10000 !important;
+  max-width: 700px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* ── Footer ── */
@@ -246,20 +249,13 @@ body.ghbs-active .ghbs-footer-copy {
   font-size: 11px;
 }
 
-/* ── Push GitHub content inward ── */
+/* ── GitHub content spacing (minimal) ── */
 
 body.ghbs-active .application-main,
 body.ghbs-active main,
 body.ghbs-active .js-site-container {
-  margin-left: calc(var(--ghbs-panel-width) + var(--ghbs-panel-gap) * 2) !important;
-  margin-right: calc(var(--ghbs-panel-width) + var(--ghbs-panel-gap) * 2) !important;
-  padding-top: calc(var(--ghbs-header-height) + 80px) !important;
-  padding-bottom: 60px !important;
-}
-
-body.ghbs-active .container-xl,
-body.ghbs-active .container-lg {
-  max-width: 100% !important;
+  padding-top: calc(var(--ghbs-header-height) + 16px) !important;
+  padding-bottom: 16px !important;
 }
 
 /* ── Card Base ── */
@@ -1055,12 +1051,6 @@ body.ghbs-active .Link--secondary:hover {
     display: none !important;
   }
 
-  body.ghbs-active .application-main,
-  body.ghbs-active main,
-  body.ghbs-active .js-site-container {
-    margin-right: 16px !important;
-  }
-
   body.ghbs-active #ghbs-welcome-banner {
     right: 32px !important;
   }
@@ -1069,13 +1059,6 @@ body.ghbs-active .Link--secondary:hover {
 @media (max-width: 900px) {
   body.ghbs-active .ghbs-panel-left {
     display: none !important;
-  }
-
-  body.ghbs-active .application-main,
-  body.ghbs-active main,
-  body.ghbs-active .js-site-container {
-    margin-left: 16px !important;
-    margin-right: 16px !important;
   }
 
   body.ghbs-active #ghbs-welcome-banner {
