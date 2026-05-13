@@ -354,6 +354,12 @@
   function init() {
     log('Initializing...');
 
+    const path = window.location.pathname;
+    if (path !== '/' && path !== '/dashboard') {
+      log('Not on dashboard — skipping');
+      return;
+    }
+
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       setTimeout(applySkin, 300);
     } else {
