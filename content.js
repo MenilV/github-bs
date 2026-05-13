@@ -320,12 +320,48 @@
     });
   }
 
-  function applySkin() {
+  function waitForRendered(timeout) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const check = () => {
+        const hasHeader = !!document.querySelector('header');
+        const hasMain = !!document.querySelector('main, .application-main');
+        if (hasHeader && hasMain) {
+          resolve();
+          return;
+        }
+        if (Date.now() - start > timeout) {
+          log('Render timeout — proceeding anyway');
+          resolve();
+          return;
+        }
+        requestAnimationFrame(check);
+      };
+      requestAnimationFrame(check);
+    });
+  }
+
+  function scanAndInject() {
+    const layout = {
+      hasSidebar: !!document.querySelector('.dashboard-sidebar, [data-testid="dashboard-sidebar"]'),
+      hasNewsFeed: !!document.querySelector('.news, [data-testid="dashboard-feed"]'),
+      hasRepoList: !!document.querySelector('[data-testid="dashboard-repos"], .dashboard-sidebar .filter-list'),
+      headerHeight: document.querySelector('header')?.offsetHeight || 64,
+      mainWidth: document.querySelector('main, .application-main')?.offsetWidth || window.innerWidth,
+    };
+    log('Layout scan:', layout);
+    injectWidgets();
+  }
+
+  async function applySkin() {
     try {
       if (document.body.classList.contains(GHBS_CLASS)) {
         enhanceActivityFeed();
         return;
       }
+
+      log('Waiting for GitHub render...');
+      await waitForRendered(5000);
 
       log('Applying GitHub BS skin...');
 
@@ -336,7 +372,7 @@
 
       document.body.classList.add(GHBS_CLASS);
 
-      injectWidgets();
+      scanAndInject();
       localizeUI();
       enhanceActivityFeed();
 
@@ -361,32 +397,26 @@
     }
 
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      setTimeout(applySkin, 300);
+      applySkin();
     } else {
-      document.addEventListener('DOMContentLoaded', () => setTimeout(applySkin, 300));
+      document.addEventListener('DOMContentLoaded', () => applySkin());
     }
 
     document.addEventListener('turbo:render', () => {
       log('Turbo navigation — re-applying');
-      setTimeout(() => {
-        document.body.classList.remove(GHBS_CLASS);
-        applySkin();
-      }, 200);
+      document.body.classList.remove(GHBS_CLASS);
+      applySkin();
     });
 
     document.addEventListener('pjax:end', () => {
       log('Pjax navigation — re-applying');
-      setTimeout(() => {
-        document.body.classList.remove(GHBS_CLASS);
-        applySkin();
-      }, 200);
+      document.body.classList.remove(GHBS_CLASS);
+      applySkin();
     });
 
     window.addEventListener('popstate', () => {
-      setTimeout(() => {
-        document.body.classList.remove(GHBS_CLASS);
-        applySkin();
-      }, 300);
+      document.body.classList.remove(GHBS_CLASS);
+      applySkin();
     });
 
     const observer = new MutationObserver((mutations) => {
