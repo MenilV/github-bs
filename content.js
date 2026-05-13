@@ -1,0 +1,405 @@
+(function () {
+  'use strict';
+
+  const DEBUG = true;
+  const log = (...args) => DEBUG && console.log('[GitHub BS]', ...args);
+  const err = (...args) => console.error('[GitHub BS]', ...args);
+
+  const GHBS_CLASS = 'ghbs-active';
+
+  const BOSNIAN_QUOTES = [
+    'Polako se daleko stiže.',
+    'Ko rano rani, dvije sreće grabi.',
+    'Bogu iza nogu — najsigurnije.',
+    'Nije zlato sve što sija, ali ćevapi jesu.',
+    'Bolje vrabac u ruci nego golub na grani.',
+    'Gdje ima dima, ima i ćevapa.',
+    'Šta možeš danas, nemoj ostavljati za sutra.',
+    'Bez muke nema nauke — ni ćevapa bez ražnja.',
+  ];
+
+  const STICKY_MESSAGES = [
+    'Ne zaboravi pull request za ražnjiće! 🥩',
+    'Sastanak u 15:00 — donesi ćevape!',
+    'Deploy na producku: petak poslije ručka.',
+    'Review: ramstew fan club PR #42 🔥',
+    'Danas je dan za refaktorisanje legacy koda.',
+    'Nemoj pushati petkom poslije 16h! ⚠️',
+    'Burek sa mesom za sprint planning.',
+    'Git merge — reci ne ratu, reci da ćevapu.',
+  ];
+
+  const STATUS_ITEMS = [
+    { label: 'GitHub', status: 'ONLINE', color: 'green' },
+    { label: 'API', status: 'ONLINE', color: 'green' },
+    { label: 'Ćevapi', status: 'FRESH', color: 'yellow' },
+    { label: 'Rakija', status: 'PREMIUM', color: 'purple' },
+  ];
+
+  const CHART_DATA = [
+    { label: 'Commitova danas', value: 85 },
+    { label: 'PR-ova otvorenih', value: 62 },
+    { label: 'Issues riješenih', value: 45 },
+    { label: 'Redova koda', value: 92 },
+    { label: 'Popijenih kafa', value: 78 },
+  ];
+
+  const MONTHS_BS = [
+    'januar', 'februar', 'mart', 'april', 'maj', 'juni',
+    'juli', 'august', 'septembar', 'oktobar', 'novembar', 'decembar',
+  ];
+
+  const DAYS_BS = [
+    'nedjelja', 'ponedjeljak', 'utorak', 'srijeda', 'četvrtak', 'petak', 'subota',
+  ];
+
+  function el(tag, classes, html) {
+    const e = document.createElement(tag);
+    if (classes) e.className = classes;
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  function randomFrom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function getUsername() {
+    const meta = document.querySelector('meta[name="user-login"]');
+    if (meta) return meta.getAttribute('content');
+    const avatar = document.querySelector('.avatar-user');
+    if (avatar) return avatar.getAttribute('alt')?.replace('@', '') || 'Beroš';
+    return 'Beroš';
+  }
+
+  function currentDateBS() {
+    const d = new Date();
+    return `${DAYS_BS[d.getDay()]}, ${d.getDate()}. ${MONTHS_BS[d.getMonth()]} ${d.getFullYear()}.`;
+  }
+
+  function buildWeatherWidget() {
+    return el('div', 'ghbs-card ghbs-weather-widget', `
+      <div class="ghbs-card-header">🌤 Vrijeme</div>
+      <div class="ghbs-weather-body">
+        <div class="ghbs-weather-icon">☀</div>
+        <div class="ghbs-weather-info">
+          <div class="ghbs-weather-temp">29°C</div>
+          <div class="ghbs-weather-condition">Sunčano</div>
+        </div>
+        <div class="ghbs-weather-location">Sarajevo</div>
+      </div>
+    `);
+  }
+
+  function buildQuoteCard() {
+    const quote = randomFrom(BOSNIAN_QUOTES);
+    return el('div', 'ghbs-card ghbs-quote-card', `
+      <div class="ghbs-quote-pin">📌</div>
+      <div class="ghbs-quote-text">"${quote}"</div>
+      <div class="ghbs-quote-attribution">— poslovica</div>
+    `);
+  }
+
+  function buildWelcomeBanner() {
+    const username = getUsername();
+    return el('div', 'ghbs-card ghbs-welcome-banner', `
+      <div class="ghbs-welcome-accent"></div>
+      <div class="ghbs-welcome-content">
+        <h2 class="ghbs-welcome-title">Dobrodošli nazad, <span class="ghbs-welcome-user">${username}</span>!</h2>
+        <p class="ghbs-welcome-date">${currentDateBS()}</p>
+        <p class="ghbs-welcome-subtitle">Spremni za novi dan kodiranja? 🚀</p>
+      </div>
+    `);
+  }
+
+  function buildChartWidget() {
+    const bars = CHART_DATA.map(
+      (item) => `
+        <div class="ghbs-chart-row">
+          <span class="ghbs-chart-label">${item.label}</span>
+          <div class="ghbs-chart-bar-track">
+            <div class="ghbs-chart-bar-fill" style="width: ${item.value}%"></div>
+          </div>
+          <span class="ghbs-chart-value">${item.value}%</span>
+        </div>
+      `
+    ).join('');
+    return el('div', 'ghbs-card ghbs-chart-widget', `
+      <div class="ghbs-card-header">📊 Statistički podaci</div>
+      <div class="ghbs-chart-body">${bars}</div>
+    `);
+  }
+
+  function buildStatusBox() {
+    const tags = STATUS_ITEMS.map(
+      (item) => `<span class="ghbs-status-tag ghbs-status-${item.color}">${item.label}: ${item.status}</span>`
+    ).join('');
+    return el('div', 'ghbs-card ghbs-status-box', `
+      <div class="ghbs-card-header">🔌 Status</div>
+      <div class="ghbs-status-body">${tags}</div>
+    `);
+  }
+
+  function buildStickyNote() {
+    const msg = randomFrom(STICKY_MESSAGES);
+    return el('div', 'ghbs-card ghbs-sticky-note', `
+      <div class="ghbs-sticky-pin">📌</div>
+      <div class="ghbs-sticky-content">${msg}</div>
+    `);
+  }
+
+  function buildTrendingWidget() {
+    return el('div', 'ghbs-card ghbs-trending-widget', `
+      <div class="ghbs-card-header">🔥 Popularni repozitoriji</div>
+      <div class="ghbs-trending-body">
+        <p class="ghbs-trending-placeholder">GitHub Trending</p>
+      </div>
+    `);
+  }
+
+  function buildFooter() {
+    return el('div', 'ghbs-footer', `
+      <div class="ghbs-footer-inner">
+        <span class="ghbs-footer-brand">git.ba</span>
+        <span class="ghbs-footer-tagline">Štampano u Bosni 🇧🇦</span>
+        <span class="ghbs-footer-copy">© ${new Date().getFullYear()} — Ćevapi open source</span>
+      </div>
+    `);
+  }
+
+  function injectWidgets() {
+    if (document.getElementById('ghbs-overlay')) return;
+
+    const overlay = el('div', 'ghbs-overlay');
+    overlay.id = 'ghbs-overlay';
+
+    const leftPanel = el('div', 'ghbs-panel-left');
+    leftPanel.id = 'ghbs-left-panel';
+    leftPanel.appendChild(buildWeatherWidget());
+    leftPanel.appendChild(buildQuoteCard());
+
+    const rightPanel = el('div', 'ghbs-panel-right');
+    rightPanel.id = 'ghbs-right-panel';
+    rightPanel.appendChild(buildChartWidget());
+    rightPanel.appendChild(buildStatusBox());
+    rightPanel.appendChild(buildStickyNote());
+    rightPanel.appendChild(buildTrendingWidget());
+
+    const welcomeBanner = buildWelcomeBanner();
+    welcomeBanner.id = 'ghbs-welcome-banner';
+
+    const footer = buildFooter();
+    footer.id = 'ghbs-footer';
+
+    overlay.appendChild(leftPanel);
+    overlay.appendChild(rightPanel);
+    overlay.appendChild(welcomeBanner);
+    overlay.appendChild(footer);
+
+    document.body.appendChild(overlay);
+
+    log('Widgets injected');
+  }
+
+  function localizeUI() {
+    const translations = [
+      { selector: '[data-content="Dashboard"]', text: 'Nadzorna ploča' },
+      { selector: 'button[aria-label="Search or jump to…"]', attr: 'aria-label', text: 'Pretraži ili idi na…' },
+      { selector: '[data-content="Home"]', text: 'Početna' },
+      { selector: '[data-content="Top Repositories"]', text: 'Najpopularniji repozitoriji' },
+      { selector: 'input[placeholder="Find a repository..."]', attr: 'placeholder', text: 'Pronađi repozitorij...' },
+      { selector: '[data-content="New"]', text: 'Novi' },
+      { selector: '[data-content="Latest from our changelog"]', text: 'Najnovije iz dnevnika promjena' },
+      { selector: 'a[href$="/changelog"]', text: 'Pogledaj dnevnik →' },
+      { selector: 'button[aria-label="Ask Copilot"]', text: 'Pitaj' },
+      { selector: '[data-content="All repositories"]', text: 'Svi repozitoriji' },
+      { selector: '[data-content="Create issue"]', text: 'Kreiraj issue' },
+      { selector: '[data-content="Write code"]', text: 'Piši kod' },
+      { selector: '[data-content="Show more"]', text: 'Prikaži više' },
+      { selector: '[data-content="Show less"]', text: 'Prikaži manje' },
+      { selector: '[data-content="Copilot"]', text: 'Copilot' },
+      { selector: '[data-content="Agent"]', text: 'Agent' },
+      { selector: '[data-content="Explore"]', text: 'Istraži' },
+      { selector: '[data-content="Pull requests"]', text: 'Pull requestovi' },
+      { selector: '[data-content="Issues"]', text: 'Issue-i' },
+      { selector: '[data-content="Codespaces"]', text: 'Codespaces' },
+      { selector: '[data-content="Marketplace"]', text: 'Tržnica' },
+      { selector: '[data-content="Notifications"]', text: 'Obavijesti' },
+    ];
+
+    translations.forEach(({ selector, text, attr }) => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach((el) => {
+        if (attr) {
+          el.setAttribute(attr, text);
+        } else {
+          el.textContent = text;
+        }
+      });
+    });
+
+    const textMap = {
+      'Dashboard': 'Nadzorna ploča',
+      'Home': 'Početna',
+      'Top Repositories': 'Najpopularniji repozitoriji',
+      'Find a repository...': 'Pronađi repozitorij...',
+      'New': 'Novi',
+      'Latest from our changelog': 'Najnovije iz dnevnika promjena',
+      'View changelog': 'Pogledaj dnevnik',
+      'Ask': 'Pitaj',
+      'All repositories': 'Svi repozitoriji',
+      'Create issue': 'Kreiraj issue',
+      'Write code': 'Piši kod',
+      'Show more': 'Prikaži više',
+      'Show less': 'Prikaži manje',
+      'Explore': 'Istraži',
+      'Pull requests': 'Pull requestovi',
+      'Issues': 'Issue-i',
+      'Codespaces': 'Codespaces',
+      'Marketplace': 'Tržnica',
+      'Notifications': 'Obavijesti',
+    };
+
+    ['header', '.application-main', '.dashboard-sidebar', 'main'].forEach((containerSelector) => {
+      const container = document.querySelector(containerSelector);
+      if (!container) return;
+
+      const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+        acceptNode: (node) => {
+          const text = node.textContent.trim();
+          return textMap[text] ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        },
+      });
+
+      const nodesToReplace = [];
+      while (walker.nextNode()) {
+        nodesToReplace.push(walker.currentNode);
+      }
+
+      nodesToReplace.forEach((node) => {
+        const text = node.textContent.trim();
+        if (textMap[text]) {
+          node.textContent = textMap[text];
+        }
+      });
+    });
+  }
+
+  function enhanceActivityFeed() {
+    const newsItems = document.querySelectorAll('.news li, .news article, .news .Box-row');
+
+    newsItems.forEach((item) => {
+      if (item.classList.contains('ghbs-enhanced')) return;
+      item.classList.add('ghbs-enhanced', 'ghbs-feed-item');
+
+      const classes = item.className;
+      let badgeType = 'blue';
+      let badgeLabel = 'PR';
+
+      if (classes.includes('push')) { badgeType = 'green'; badgeLabel = 'Push'; }
+      else if (classes.includes('issues') || classes.includes('issue')) { badgeType = 'purple'; badgeLabel = 'Issue'; }
+      else if (classes.includes('pull_request') || classes.includes('pull-request')) { badgeType = 'blue'; badgeLabel = 'PR'; }
+      else if (classes.includes('star')) { badgeType = 'yellow'; badgeLabel = 'Star'; }
+      else if (classes.includes('fork')) { badgeType = 'green'; badgeLabel = 'Fork'; }
+      else if (classes.includes('release') || classes.includes('tag')) { badgeType = 'green'; badgeLabel = 'Release'; }
+      else if (classes.includes('comment')) { badgeType = 'blue'; badgeLabel = 'Komentar'; }
+      else if (classes.includes('member') || classes.includes('team')) { badgeType = 'purple'; badgeLabel = 'Tim'; }
+      else if (classes.includes('create')) { badgeType = 'green'; badgeLabel = 'Kreirano'; }
+      else if (classes.includes('delete')) { badgeType = 'red'; badgeLabel = 'Obrisano'; }
+
+      const badge = el('span', `ghbs-badge ghbs-badge-${badgeType}`, badgeLabel);
+      const titleEl = item.querySelector('.title, strong, a');
+      if (titleEl && !item.querySelector('.ghbs-badge')) {
+        titleEl.parentNode?.insertBefore(badge, titleEl);
+      } else if (!item.querySelector('.ghbs-badge')) {
+        item.prepend(badge);
+      }
+
+      const time = item.querySelector('relative-time, time');
+      if (time) time.classList.add('ghbs-time');
+    });
+  }
+
+  function applySkin() {
+    try {
+      if (document.body.classList.contains(GHBS_CLASS)) {
+        enhanceActivityFeed();
+        return;
+      }
+
+      log('Applying GitHub BS skin...');
+
+      const header = document.querySelector('header');
+      if (header) {
+        header.classList.add('ghbs-topbar');
+      }
+
+      document.body.classList.add(GHBS_CLASS);
+
+      injectWidgets();
+      localizeUI();
+      enhanceActivityFeed();
+
+      const activeNav = document.querySelector('.Header-item .selected, .header-nav-link.selected, nav a[aria-current="page"]');
+      if (activeNav) {
+        activeNav.classList.add('ghbs-nav-active');
+      }
+
+      log('GitHub BS skin applied successfully');
+    } catch (e) {
+      err('Error applying skin:', e);
+    }
+  }
+
+  function init() {
+    log('Initializing...');
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(applySkin, 300);
+    } else {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(applySkin, 300));
+    }
+
+    document.addEventListener('turbo:render', () => {
+      log('Turbo navigation — re-applying');
+      setTimeout(() => {
+        document.body.classList.remove(GHBS_CLASS);
+        applySkin();
+      }, 200);
+    });
+
+    document.addEventListener('pjax:end', () => {
+      log('Pjax navigation — re-applying');
+      setTimeout(() => {
+        document.body.classList.remove(GHBS_CLASS);
+        applySkin();
+      }, 200);
+    });
+
+    window.addEventListener('popstate', () => {
+      setTimeout(() => {
+        document.body.classList.remove(GHBS_CLASS);
+        applySkin();
+      }, 300);
+    });
+
+    const observer = new MutationObserver((mutations) => {
+      let needsEnhance = false;
+      for (const m of mutations) {
+        if (m.type === 'childList' && m.addedNodes.length > 0) {
+          needsEnhance = true;
+          break;
+        }
+      }
+      if (needsEnhance) enhanceActivityFeed();
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
