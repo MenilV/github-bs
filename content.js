@@ -220,6 +220,7 @@
     const translations = [
       { selector: '[data-content="Dashboard"]', text: 'Nadzorna ploča' },
       { selector: 'button[aria-label="Search or jump to…"]', attr: 'aria-label', text: 'Pretraži ili idi na…' },
+      { selector: '.header-search-input', attr: 'placeholder', text: 'Pritisni / za pretragu' },
       { selector: '[data-content="Home"]', text: 'Početna' },
       { selector: '[data-content="Top Repositories"]', text: 'Najpopularniji repozitoriji' },
       { selector: 'input[placeholder="Find a repository..."]', attr: 'placeholder', text: 'Pronađi repozitorij...' },
@@ -240,6 +241,13 @@
       { selector: '[data-content="Codespaces"]', text: 'Codespaces' },
       { selector: '[data-content="Marketplace"]', text: 'Tržnica' },
       { selector: '[data-content="Notifications"]', text: 'Obavijesti' },
+      { selector: '[data-content="Settings"]', text: 'Postavke' },
+      { selector: '[data-content="Your profile"]', text: 'Vaš profil' },
+      { selector: '[data-content="Your repositories"]', text: 'Vaši repozitoriji' },
+      { selector: '[data-content="Your organizations"]', text: 'Vaše organizacije' },
+      { selector: '[data-content="Your projects"]', text: 'Vaši projekti' },
+      { selector: '[data-content="Your stars"]', text: 'Vaše zvijezde' },
+      { selector: '[data-content="Your gists"]', text: 'Vaši gistovi' },
     ];
 
     translations.forEach(({ selector, text, attr }) => {
@@ -273,6 +281,22 @@
       'Codespaces': 'Codespaces',
       'Marketplace': 'Tržnica',
       'Notifications': 'Obavijesti',
+      'Recent activity': 'Nedavna aktivnost',
+      'Filter by type': 'Filtriraj po tipu',
+      'Public': 'Javno',
+      'Private': 'Privatno',
+      'Settings': 'Postavke',
+      'Sign out': 'Odjavi se',
+      'Your profile': 'Vaš profil',
+      'Your repositories': 'Vaši repozitoriji',
+      'Your organizations': 'Vaše organizacije',
+      'Your projects': 'Vaši projekti',
+      'Your stars': 'Vaše zvijezde',
+      'Your gists': 'Vaši gistovi',
+      'Upgrade': 'Nadogradi',
+      'Feature preview': 'Pregled novih opcija',
+      'Help': 'Pomoć',
+      'Type / to search': 'Pritisni / za pretragu',
     };
 
     ['header', '.application-main', '.dashboard-sidebar', 'main'].forEach((containerSelector) => {
