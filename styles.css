@@ -231,7 +231,7 @@ body.ghbs-active .ghbs-footer-copy {
 body.ghbs-active .application-main,
 body.ghbs-active main,
 body.ghbs-active .js-site-container {
-  padding-top: calc(var(--ghbs-header-height) + 16px) !important;
+  /* Padding removed to fix gap - relying on native GitHub spacing */
   padding-bottom: 16px !important;
 }
 
