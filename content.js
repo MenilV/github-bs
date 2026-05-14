@@ -269,6 +269,7 @@
       'New': 'Novi',
       'Latest from our changelog': 'Najnovije iz dnevnika promjena',
       'View changelog': 'Pogledaj dnevnik',
+      'View changelog →': 'Pogledaj dnevnik →',
       'Ask': 'Pitaj',
       'All repositories': 'Svi repozitoriji',
       'Create issue': 'Kreiraj issue',
@@ -297,7 +298,14 @@
       'Feature preview': 'Pregled novih opcija',
       'Help': 'Pomoć',
       'Type / to search': 'Pritisni / za pretragu',
+      // Changelog specific
+      'New enterprise installation API now in public preview': 'Novi enterprise installation API je sada u javnom pregledu',
+      'Start Copilot cloud agent tasks via the REST API': 'Pokrenite Copilot cloud agent zadatke putem REST API-ja',
+      'GitHub Enterprise Server 3.21 release candidate is available': 'GitHub Enterprise Server 3.21 release candidate je dostupan',
+      'Copilot code review: Comment experience improvements': 'Copilot code review: Poboljšanja iskustva komentarisanja',
     };
+
+    const timeRegex = /^(\d+)\s+(hours?|days?|minutes?)\s+ago$/i;
 
     ['header', '.application-main', '.dashboard-sidebar', 'main'].forEach((containerSelector) => {
       const container = document.querySelector(containerSelector);
@@ -306,7 +314,8 @@
       const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
         acceptNode: (node) => {
           const text = node.textContent.trim();
-          return textMap[text] ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+          if (textMap[text] || timeRegex.test(text)) return NodeFilter.FILTER_ACCEPT;
+          return NodeFilter.FILTER_REJECT;
         },
       });
 
@@ -319,6 +328,17 @@
         const text = node.textContent.trim();
         if (textMap[text]) {
           node.textContent = textMap[text];
+        } else {
+          const match = text.match(timeRegex);
+          if (match) {
+            const count = match[1];
+            const unit = match[2].toLowerCase();
+            let unitBs = unit;
+            if (unit.startsWith('hour')) unitBs = 'sati';
+            else if (unit.startsWith('day')) unitBs = parseInt(count) === 1 ? 'dan' : 'dana';
+            else if (unit.startsWith('min')) unitBs = 'minuta';
+            node.textContent = `prije ${count} ${unitBs}`;
+          }
         }
       });
     });
