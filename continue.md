@@ -1,110 +1,78 @@
-# GitHub BS — Continue Context
+# GitHub BS — Handoff Context for Antigravity
 
 ## Project Overview
-
-Chrome extension that skins GitHub's dashboard (github.com/ and /dashboard) with a **Bosnian theme**: dark navy + gold accent palette, cultural quotes/widgets, Bosnian UI localization. The approach is **light-touch overlay**: inject new elements without displacing GitHub's native React-managed layout.
+Chrome extension that skins GitHub's authenticated dashboard with a **Bosnian theme**: dark navy + gold accent palette, cultural quotes/widgets, and Bosnian UI localization.
 
 - **Name:** GitHub BS (Bosanski skin)
-- **Repo:** https://github.com/MenilV/github-bs
-- **Design ethos:** Dark navy (`#0a0e1a`) background, gold (`#f59e0b`) accents, subtle glow effects, Bosnian visual texture (quotes, ćevapi/rakija jokes, git.ba branding)
+- **Target Audience:** Developers who appreciate Bosnian humor, ćevapi, and rakija.
+- **Design Ethos:** Dark navy (`#0a0e1a`) background, gold (`#f59e0b`) accents, native GitHub DOM integration, clean UI but culturally funny.
 
-## Files & Roles
+## 🏗️ Architecture & Recent Refactors (CRITICAL)
 
-| File | Lines | Role |
-|------|-------|------|
-| `manifest.json` | 22 | Chrome V3 extension config. **Only fires on `github.com/` and `github.com/dashboard`** (authenticated-only paths). |
-| `content.js` | 441 | Content script — injects widgets, localizes UI text, enhances activity feed, handles SPA nav |
-| `styles.css` | 1074 | All styling — CSS variables for theme, 40+ rule blocks for GitHub component overrides |
-| `icons/` | 3 files | 16/48/128px PNG icons |
+The project recently underwent major architectural shifts. Please read these carefully before modifying the DOM or adding features:
 
-## Architecture Decisions
+1. **Native DOM Integration (No more fixed overlays)**
+   - Widgets are no longer floating in a `position: fixed` overlay.
+   - We now inject directly into GitHub's native layout:
+     - **Sidebar (`.dashboard-sidebar`)**: Stats, Status, Trending widgets.
+     - **News Feed (`.news`)**: Welcome Banner, Weather, and Proverbs (Grid layout).
+   - *Why?* This relies on GitHub's native spacing and prevents widgets from awkwardly overlapping main content on different screen sizes.
 
-### Overlay Container Pattern
-All injected elements live inside a single `#ghbs-overlay` div appended to `document.body`. The overlay has `position: fixed; inset: 0; z-index: 9999; pointer-events: none` — children set `pointer-events: auto`. This bypasses GitHub's CSS transforms/containing-block issues entirely.
+2. **React-Safe Localization (Avoiding Infinite Loops)**
+   - **THE TRAP:** GitHub uses React. If you naively use `element.textContent = "Novi tekst"`, you will destroy the React-managed SVG icons inside buttons. React will panic, re-render the button, trigger our `MutationObserver`, and cause a fatal infinite loop.
+   - **THE SOLUTION:** `localizeUI()` now uses a highly specific `TreeWalker` and explicitly checks `Node.TEXT_NODE`. We *only* replace text nodes.
+   - Example: The "New" repository button is translated to **"Novi belaj 🚀"** by specifically targeting `a[href="/new"] .Button-label` and cleanly swapping just the text node.
 
-### Widget Positioning
-Each widget panel uses **`position: fixed`** directly (not absolute inside overlay), with `z-index: 10000`:
-- **Left panel** (`#ghbs-left-panel`): `left: 16px; top: 80px; width: 270px`. Contains weather widget + quote card.
-- **Right panel** (`#ghbs-right-panel`): `right: 16px; top: 80px; width: 270px`. Contains chart, status, sticky note, trending.
-- **Welcome banner** (`#ghbs-welcome-banner`): Centered below header, `max-width: 700px`.
-- **Footer** (`#ghbs-footer`): `bottom: 0; left: 0; right: 0`.
+3. **Strict URL Scoping**
+   - The extension is strictly bound to `github.com/` and `github.com/dashboard` (Manifest `matches` + `content.js` runtime checks).
+   - It also requires the user to be logged in (checks for `meta[name="user-login"]`).
+   - *Rule:* Do not expand to repo pages or marketing pages without explicit user permission. It is meant to be a dashboard experience.
 
-### Render Timing
-The `applySkin()` function now uses `waitForRendered(5000)` — polls via `requestAnimationFrame` until both `<header>` and `<main>`/`.application-main` are in the DOM, then proceeds. This waits for GitHub's React hydration to complete. Falls back after 5s timeout.
+4. **Dynamic SPA Handling**
+   - GitHub uses Turbo/Pjax. The extension listens for `turbo:render`, `pjax:end`, and `popstate` to re-apply the skin.
+   - A `MutationObserver` watches for dynamically injected content (e.g., lazy-loaded sidebars or new feed items) and safely re-runs `localizeUI()` and `enhanceActivityFeed()`.
 
-### Content Margin Strategy (RECENT CHANGE)
-**Removed** the old margin-left/margin-right pushes on `.application-main`/`main`. GitHub content now flows entirely naturally — only minimal `padding-top` (80px) to clear the header + widgets. Widgets float on top without displacing layout.
+## 📦 Current Features
 
-### URL Scoping
-- Manifest matches: `["*://github.com/", "*://github.com/dashboard"]`
-- Runtime guard in `init()`: bails out if `pathname` is not `/` or `/dashboard`
-- Double protection against extension activating on marketing pages, repo pages, etc.
+- **Theme**: Dark navy/gold applied via CSS variables. Hover glows and slight vertical lift on widget cards.
+- **Widgets**:
+  - Welcome Banner (Username + Bosnian Date)
+  - Weather (Currently static Sarajevo weather)
+  - 2x Proverbs Cards (Random selection from `BOSNIAN_QUOTES`)
+  - Stats Chart (Static sample data)
+  - Status Box (GitHub, API, Ćevapi, Rakija)
+  - Sticky Note (Random from `STICKY_MESSAGES`)
+  - Trending Repos (Placeholder)
+  - Footer ("git.ba")
+- **Activity Feed**: Badges added to feed items (Push, Issue, PR, Star, Fork, etc.).
+- **Localization**:
+  - Massive `textMap` translating GitHub UI to Bosnian.
+  - Regex-based relative time translation (e.g., "15 hours ago" -> "prije 15 sati").
 
-### Localization
-`localizeUI()` translates GitHub nav elements via:
-1. Direct `data-content` attribute selectors (e.g., `[data-content="Dashboard"] → Nadzorna ploča`)
-2. TreeWalker text-node replacement for visible text in header, main, sidebar
+## 🚀 Next Steps / Ideas for Antigravity
 
-### Activity Feed Enhancement
-`enhanceActivityFeed()` wraps `.news li` items with Bosnian badges (Push, Issue, PR, Star, Fork, Release, Komentar, Tim, Kreirano, Obrisano) detected via CSS class matching.
+The user requested: *"improve the funny effect but to still keep a nice clean ui and structure"*
 
-### SPA Handling
-Listens for `turbo:render`, `pjax:end`, `popstate` events to re-apply skin on GitHub's client-side navigation.
+Here are approved concepts to explore next:
 
-## Current State (as of latest commit)
+1. **"Balkan Commit" Generator Widget**:
+   - Add a sleek widget with a button: "Nemam inspiracije" (I have no inspiration).
+   - Generates funny Bosnian commit messages (e.g., `fix: proradilo samo od sebe`, `chore: bogzna šta je ovo`) with a click-to-copy feature.
+2. **Developer Ranks in Welcome Banner**:
+   - Assign a dynamic title next to the user's name (styled like GitHub's "Pro" badge).
+   - Examples: `[Senior Burek Majstor]`, `[Rakija Driven Developer]`.
+3. **"Do Kafe" (Until Coffee) Tracker**:
+   - Replace one of the duplicate Proverb widgets with a clean progress bar tracking the time until the next coffee break.
+4. **Emoji Polish**:
+   - Inject subtle emojis into the Status widget or activity feed for instant visual humor.
+5. **Real Data Integration**:
+   - Fetch real weather data for Sarajevo or real GitHub trending repos, replacing the current static placeholders.
 
-### Working
-- Extension loads only on dashboard pages (manifest + runtime guard)
-- Dark navy + gold theme applied to all GitHub elements (header, buttons, sidebar, boxes, tabs, inputs, avatars, etc.)
-- Fixed-position widgets float on sides without disrupting GitHub layout
-- Welcome banner displays username and Bosnian date
-- Bosnian quotes rotate randomly
-- Weather/Chart/Status/Sticky widgets display sample data
-- Footer with "git.ba" branding
-- Bosnian UI text translations for nav elements
-- Feed items get Bosnian badges
-- SPA navigation events handled
+## ⚠️ Important Rules for Modifying
 
-### Known Issues
-1. **Widgets may overlap GitHub content** — especially on narrower viewports. The goal is to find the right balance of GitHub content shifting vs. overlay. Currently using `position: fixed` which means widgets cover whatever is underneath.
-2. **No responsive text sizing** — widgets don't adapt well to zoom levels.
-3. **Welcome banner position** needs refinement — `left: calc(270px + 32px)` assumes dashboard layout; may be off on non-standard viewports.
-4. **Widget overflow on short viewports** — panels have `max-height: calc(100vh - 96px)` but don't handle internal overflow gracefully.
-5. **No Persistence** — quotes/sticky messages change on every re-render (not a bug, but could be a feature).
+- **NEVER** use generic `innerHTML` or `textContent` overwrites on GitHub's native buttons/headers. Always target `Node.TEXT_NODE`.
+- Maintain the `.ghbs-active` class structure in CSS.
+- Ensure all custom CSS selectors are heavily weighted (`!important` or high specificity) to beat GitHub's native utility classes (Primer).
+- Always verify changes don't break the `MutationObserver`. If the tab freezes, you've caused an infinite render loop with React.
 
-### Recently Removed
-- **Margin pushes** on GitHub content — was too disruptive, made dashboard look stretched
-- **`.container-xl`/`.container-lg` max-width override** — was stretching content containers
-
-## Git History
-
-```
-e531071 refactor: remove layout disruption, switch to light-touch injection
-91d5eb0 fix: add runtime URL guard to prevent theming non-dashboard pages
-1340bf7 chore: restrict extension to logged-in dashboard only
-e4964f0 fix: pin widgets with position:fixed so they stay on viewport
-4e0ea23 feat: initial Bosnian GitHub theme extension
-```
-
-## Git Config
-- `user.name`: MenilV
-- `user.email`: menil.vukovic@gmail.com
-- Remote: `origin → git@github.com:MenilV/github-bs.git`
-- Branch: `main`
-
-## Next Steps (discussed with user)
-
-1. **Smart injection timing** ✅ Done — `waitForRendered()` polls for GitHub's React hydration
-2. **DOM structure scanning** ✅ Done — `scanAndInject()` detects sidebar, news feed, repo list, measures header/main dimensions
-3. **Position widgets based on actual layout** — use scanned dimensions rather than hardcoded CSS `--ghbs-panel-width` and `--ghbs-panel-gap` values
-4. **Handle GitHub's content shift** so widgets don't overlap important UI — shift GitHub content via padding only when there's room
-5. **Expand coverage** to other authenticated pages (repo, PR, issues) with page-specific layouts
-
-## Engineering Conventions (follow these)
-
-- **Never mutate existing DOM nodes** that React manages. Only append new elements.
-- **Always use `!important`** on positioning CSS rules to beat GitHub's specificity.
-- **All positioning is fixed** — no absolute positioning that depends on parent context.
-- **CSS variables** for theme consistency. All color/radius/shadow values come from `:root` vars.
-- **Overlay pattern** for injection — single fixed container, individual panels inside with `position: fixed`.
-- **Session context file**: `/Users/menilvukovic/.local/share/opencode/sessions/...` (check `session_list` for latest).
+Good luck! 🇧🇦🚀
