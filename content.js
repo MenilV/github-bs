@@ -415,7 +415,6 @@
   async function applySkin() {
     try {
       if (document.body.classList.contains(GHBS_CLASS)) {
-        localizeUI();
         enhanceActivityFeed();
         return;
       }
@@ -480,14 +479,14 @@
     });
 
     const observer = new MutationObserver((mutations) => {
-      let needsUpdate = false;
+      let needsEnhance = false;
       for (const m of mutations) {
         if (m.type === 'childList' && m.addedNodes.length > 0) {
-          needsUpdate = true;
+          needsEnhance = true;
           break;
         }
       }
-      if (needsUpdate) applySkin();
+      if (needsEnhance) enhanceActivityFeed();
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
