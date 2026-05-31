@@ -261,15 +261,10 @@
       });
     });
 
-    // Explicitly target Button-labels (like the New repository button)
-    document.querySelectorAll('.Button-label, .btn').forEach(el => {
+    // Explicitly target the "New" repository button using the exact structure
+    document.querySelectorAll('a[href="/new"] .Button-label, a[href^="/new"] .Button-label').forEach(el => {
       if (el.textContent.trim() === 'New') {
-        // If it's a node with mixed content (e.g. SVG + text), we just replace the text node
-        Array.from(el.childNodes).forEach(node => {
-          if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === 'New') {
-            node.textContent = 'Novi belaj 🚀';
-          }
-        });
+        el.textContent = 'Novi belaj 🚀';
       }
     });
 
