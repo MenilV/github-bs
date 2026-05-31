@@ -254,9 +254,9 @@
       const elements = document.querySelectorAll(selector);
       elements.forEach((el) => {
         if (attr) {
-          if (el.getAttribute(attr) !== text) el.setAttribute(attr, text);
+          el.setAttribute(attr, text);
         } else {
-          if (el.textContent !== text) el.textContent = text;
+          el.textContent = text;
         }
       });
     });
@@ -334,9 +334,7 @@
       nodesToReplace.forEach((node) => {
         const text = node.textContent.trim();
         if (textMap[text]) {
-          if (node.textContent !== textMap[text]) {
-            node.textContent = textMap[text];
-          }
+          node.textContent = textMap[text];
         } else {
           const match = text.match(timeRegex);
           if (match) {
@@ -346,10 +344,7 @@
             if (unit.startsWith('hour')) unitBs = 'sati';
             else if (unit.startsWith('day')) unitBs = parseInt(count) === 1 ? 'dan' : 'dana';
             else if (unit.startsWith('min')) unitBs = 'minuta';
-            const newText = `prije ${count} ${unitBs}`;
-            if (node.textContent !== newText) {
-              node.textContent = newText;
-            }
+            node.textContent = `prije ${count} ${unitBs}`;
           }
         }
       });
@@ -484,17 +479,14 @@
     });
 
     const observer = new MutationObserver((mutations) => {
-      let needsUpdate = false;
+      let needsEnhance = false;
       for (const m of mutations) {
         if (m.type === 'childList' && m.addedNodes.length > 0) {
-          needsUpdate = true;
+          needsEnhance = true;
           break;
         }
       }
-      if (needsUpdate) {
-        localizeUI();
-        enhanceActivityFeed();
-      }
+      if (needsEnhance) enhanceActivityFeed();
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
