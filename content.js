@@ -254,18 +254,34 @@
       const elements = document.querySelectorAll(selector);
       elements.forEach((el) => {
         if (attr) {
-          el.setAttribute(attr, text);
+          if (el.getAttribute(attr) !== text) {
+            el.setAttribute(attr, text);
+          }
         } else {
-          el.textContent = text;
+          // Safe text replacement to avoid destroying React SVG children
+          let hasUpdated = false;
+          Array.from(el.childNodes).forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0) {
+              if (node.textContent.trim() !== text) {
+                node.textContent = node.textContent.replace(node.textContent.trim(), text);
+                hasUpdated = true;
+              }
+            }
+          });
+          if (!hasUpdated && el.childNodes.length === 0 && el.textContent !== text) {
+            el.textContent = text;
+          }
         }
       });
     });
 
     // Explicitly target the "New" repository button using the exact structure
     document.querySelectorAll('a[href="/new"] .Button-label, a[href^="/new"] .Button-label').forEach(el => {
-      if (el.textContent.trim() === 'New') {
-        el.textContent = 'Novi belaj 🚀';
-      }
+      Array.from(el.childNodes).forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === 'New') {
+          node.textContent = node.textContent.replace('New', 'Novi belaj 🚀');
+        }
+      });
     });
 
     const textMap = {
@@ -334,7 +350,9 @@
       nodesToReplace.forEach((node) => {
         const text = node.textContent.trim();
         if (textMap[text]) {
-          node.textContent = textMap[text];
+          if (!node.textContent.includes(textMap[text])) {
+            node.textContent = node.textContent.replace(text, textMap[text]);
+          }
         } else {
           const match = text.match(timeRegex);
           if (match) {
@@ -344,7 +362,10 @@
             if (unit.startsWith('hour')) unitBs = 'sati';
             else if (unit.startsWith('day')) unitBs = parseInt(count) === 1 ? 'dan' : 'dana';
             else if (unit.startsWith('min')) unitBs = 'minuta';
-            node.textContent = `prije ${count} ${unitBs}`;
+            const newText = `prije ${count} ${unitBs}`;
+            if (!node.textContent.includes(newText)) {
+              node.textContent = node.textContent.replace(text, newText);
+            }
           }
         }
       });
@@ -479,14 +500,17 @@
     });
 
     const observer = new MutationObserver((mutations) => {
-      let needsEnhance = false;
+      let needsUpdate = false;
       for (const m of mutations) {
         if (m.type === 'childList' && m.addedNodes.length > 0) {
-          needsEnhance = true;
+          needsUpdate = true;
           break;
         }
       }
-      if (needsEnhance) enhanceActivityFeed();
+      if (needsUpdate) {
+        localizeUI();
+        enhanceActivityFeed();
+      }
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
