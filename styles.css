@@ -1261,3 +1261,83 @@ body.ghbs-active .ghbs-coffee-advice {
   line-height: 1.4 !important;
   margin-top: 4px !important;
 }
+
+/* ── Search Bureaucracy Warning ── */
+
+body.ghbs-active .ghbs-search-warning {
+  position: absolute !important;
+  background: var(--ghbs-surface) !important;
+  border: 1px solid var(--ghbs-accent-dim) !important;
+  border-radius: var(--ghbs-radius) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 12px rgba(245, 158, 11, 0.1) !important;
+  padding: 12px !important;
+  display: flex !important;
+  gap: 10px !important;
+  z-index: 200000 !important;
+  animation: ghbs-slide-down 200ms ease-out !important;
+  box-sizing: border-box !important;
+}
+
+body.ghbs-active .ghbs-search-warning.ghbs-fade-out {
+  opacity: 0 !important;
+  transform: translateY(-8px) !important;
+  transition: opacity 300ms ease, transform 300ms ease !important;
+}
+
+@keyframes ghbs-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body.ghbs-active .ghbs-warning-icon {
+  font-size: 20px !important;
+  line-height: 1 !important;
+}
+
+body.ghbs-active .ghbs-warning-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  flex: 1 !important;
+}
+
+body.ghbs-active .ghbs-warning-title {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--ghbs-accent) !important;
+}
+
+body.ghbs-active .ghbs-warning-desc {
+  font-size: 11px !important;
+  color: var(--ghbs-text-muted) !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+body.ghbs-active .ghbs-warning-bribe-btn {
+  align-self: flex-start !important;
+  background: linear-gradient(135deg, var(--ghbs-accent-dim), var(--ghbs-accent)) !important;
+  border: none !important;
+  color: #000 !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  padding: 4px 10px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: opacity var(--ghbs-transition), transform 100ms ease !important;
+}
+
+body.ghbs-active .ghbs-warning-bribe-btn:hover {
+  opacity: 0.9 !important;
+}
+
+body.ghbs-active .ghbs-warning-bribe-btn:active {
+  transform: scale(0.96) !important;
+}

@@ -436,8 +436,8 @@
   function localizeUI() {
     const translations = [
       { selector: '[data-content="Dashboard"]', text: 'Nadzorna ploča' },
-      { selector: 'button[aria-label="Search or jump to…"]', attr: 'aria-label', text: 'Pretraži ili idi na…' },
-      { selector: '.header-search-input', attr: 'placeholder', text: 'Pritisni / za pretragu' },
+      { selector: 'button[aria-label="Search or jump to…"]', attr: 'aria-label', text: 'Pretraži (ili nađi štelu)…' },
+      { selector: '.header-search-input', attr: 'placeholder', text: 'Pretraga (fali ti papir)... 📄' },
       { selector: '[data-content="Home"]', text: 'Početna' },
       { selector: '[data-content="Top Repositories"]', text: 'Najpopularniji repozitoriji' },
       { selector: 'input[placeholder="Find a repository..."]', attr: 'placeholder', text: 'Pronađi repozitorij...' },
@@ -535,7 +535,9 @@
       'Upgrade': 'Nadogradi',
       'Feature preview': 'Pregled novih opcija',
       'Help': 'Pomoć',
-      'Type / to search': 'Pritisni / za pretragu',
+      'Type / to search': 'Pretraga (fali ti papir)... 📄',
+      'Search or jump to...': 'Pretraži (ili nađi štelu)... 🔍',
+      'Search...': 'Uplati taksu pa traži... 💸',
       'New enterprise installation API now in public preview': 'Novi enterprise installation API je sada u javnom pregledu',
       'Start Copilot cloud agent tasks via the REST API': 'Pokrenite Copilot cloud agent zadatke putem REST API-ja',
       'GitHub Enterprise Server 3.21 release candidate is available': 'GitHub Enterprise Server 3.21 release candidate je dostupan',
@@ -619,6 +621,56 @@
       const time = item.querySelector('relative-time, time');
       if (time) time.classList.add('ghbs-time');
     });
+  }
+
+  function showSearchBureaucracyWarning(inputEl) {
+    if (document.querySelector('.ghbs-search-warning')) return;
+    
+    const warning = el('div', 'ghbs-search-warning');
+    warning.innerHTML = `
+      <span class="ghbs-warning-icon">⚠️</span>
+      <div class="ghbs-warning-body">
+        <div class="ghbs-warning-title">Fali ti papir!</div>
+        <p class="ghbs-warning-desc">Nedostaje rodni list (ne stariji od 6 mjeseci) i taksa od 2 KM za pretragu.</p>
+        <button class="ghbs-warning-bribe-btn">💸 Traži preko štele</button>
+      </div>
+    `;
+    
+    const rect = inputEl.getBoundingClientRect();
+    warning.style.top = `${rect.bottom + window.scrollY + 8}px`;
+    warning.style.left = `${rect.left + window.scrollX}px`;
+    warning.style.width = `${Math.max(280, rect.width)}px`;
+    
+    document.body.appendChild(warning);
+    
+    const bribeBtn = warning.querySelector('.ghbs-warning-bribe-btn');
+    bribeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      
+      const body = warning.querySelector('.ghbs-warning-body');
+      body.innerHTML = `
+        <div class="ghbs-warning-title" style="color: var(--ghbs-success) !important;">✅ Sređeno!</div>
+        <p class="ghbs-warning-desc">Amidža Salko je odobrio pretragu preko reda bez uplatnice.</p>
+      `;
+      
+      setTimeout(() => {
+        warning.classList.add('ghbs-fade-out');
+        setTimeout(() => warning.remove(), 300);
+      }, 2500);
+    });
+    
+    const dismissHandler = (e) => {
+      if (!warning.contains(e.target) && e.target !== inputEl) {
+        warning.classList.add('ghbs-fade-out');
+        setTimeout(() => warning.remove(), 300);
+        document.removeEventListener('click', dismissHandler);
+      }
+    };
+    
+    setTimeout(() => {
+      document.addEventListener('click', dismissHandler);
+    }, 100);
   }
 
   function waitForRendered(timeout) {
@@ -739,6 +791,19 @@
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // Intercept clicks on search inputs or buttons to display bureaucracy warning
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('button, input');
+      if (!target) return;
+
+      const isSearchButton = target.matches('button[aria-label*="Search"], button[aria-label*="Pretraži"]');
+      const isSearchInput = target.matches('.header-search-input, input[placeholder*="Pretragu"], input[placeholder*="search"]');
+
+      if (isSearchButton || isSearchInput) {
+        showSearchBureaucracyWarning(target);
+      }
+    });
   }
 
   if (document.readyState === 'loading') {
