@@ -36,12 +36,38 @@
     { label: 'Rakija', status: 'PREMIUM', color: 'purple' },
   ];
 
+  const BALKAN_COMMITS = [
+    'fix: proradilo samo od sebe',
+    'feat: dodao nešto boga pitaj šta je',
+    'chore: kafa gotova odoh ja',
+    'fix: popravio što je Đuro pokvario',
+    'style: šminka čista',
+    'refactor: bog otac ne zna šta sam ovdje uradio',
+    'docs: mrsko mi pisat dokumentaciju',
+    'feat: radi na mom računaru, sretno na produkciji',
+    'chore: kumin mali rek’o da ovako treba',
+    'fix: zakrpio da drži vodu dok majstori odu',
+    'bug: ne radi al nema veze popiću kafu pa ću vidjet',
+    'test: testirao na sebi i dobro je',
+    'merge: ko preživi pritisnuće merge',
+    'feat: ubacio bureka sa sirom da nerviram sarajlije',
+    'fix: maknuo bag da šef ne galami',
+    'WIP: radim al sporo',
+    'fix: vratio kako je bilo prije nego što sam pokvario'
+  ];
+
   const CHART_DATA = [
     { label: 'Commitova danas', value: 85 },
     { label: 'PR-ova otvorenih', value: 62 },
     { label: 'Issues riješenih', value: 45 },
     { label: 'Redova koda', value: 92 },
     { label: 'Popijenih kafa', value: 78 },
+  ];
+
+  const MOCK_TRENDING_REPOS = [
+    { name: 'cevap-api', desc: 'REST API za naručivanje desetke u pola s lukom.', stars: '132', lang: 'Go', langColor: '#00ADD8' },
+    { name: 'rakija-blockchain', desc: 'Decentralizovani konsenzus za destilaciju šljive.', stars: '98', lang: 'Rust', langColor: '#deb887' },
+    { name: 'burek-detector', desc: 'AI model koji provjerava da li je pita sa sirom ili burek.', stars: '254', lang: 'Python', langColor: '#3572A5' }
   ];
 
   const MONTHS_BS = [
@@ -94,9 +120,11 @@
   function buildQuoteCard() {
     const quote = randomFrom(BOSNIAN_QUOTES);
     return el('div', 'ghbs-card ghbs-quote-card', `
-      <div class="ghbs-quote-pin">📌</div>
-      <div class="ghbs-quote-text">"${quote}"</div>
-      <div class="ghbs-quote-attribution">— poslovica</div>
+      <div class="ghbs-card-header">📜 Mudrost dana</div>
+      <div class="ghbs-quote-body">
+        <div class="ghbs-quote-text">"${quote}"</div>
+        <div class="ghbs-quote-attribution">— narodna poslovica</div>
+      </div>
     `);
   }
 
@@ -113,47 +141,105 @@
   }
 
   function buildChartWidget() {
-    const bars = CHART_DATA.map(
+    const rows = CHART_DATA.map(
       (item) => `
-        <div class="ghbs-chart-row">
-          <span class="ghbs-chart-label">${item.label}</span>
-          <div class="ghbs-chart-bar-track">
-            <div class="ghbs-chart-bar-fill" style="width: ${item.value}%"></div>
-          </div>
-          <span class="ghbs-chart-value">${item.value}%</span>
+        <span class="ghbs-chart-label">${item.label}</span>
+        <div class="ghbs-chart-bar-track">
+          <div class="ghbs-chart-bar-fill" style="width: ${item.value}%"></div>
         </div>
+        <span class="ghbs-chart-value">${item.value}%</span>
       `
     ).join('');
     return el('div', 'ghbs-card ghbs-chart-widget', `
       <div class="ghbs-card-header">📊 Statistički podaci</div>
-      <div class="ghbs-chart-body">${bars}</div>
+      <div class="ghbs-chart-body">${rows}</div>
     `);
   }
 
   function buildStatusBox() {
-    const tags = STATUS_ITEMS.map(
-      (item) => `<span class="ghbs-status-tag ghbs-status-${item.color}">${item.label}: ${item.status}</span>`
+    const rows = STATUS_ITEMS.map(
+      (item) => `
+        <span class="ghbs-status-label">${item.label}</span>
+        <div class="ghbs-status-value-container">
+          <span class="ghbs-status-dot ghbs-status-dot-${item.color}"></span>
+          <span class="ghbs-status-text ghbs-status-${item.color}">${item.status}</span>
+        </div>
+      `
     ).join('');
     return el('div', 'ghbs-card ghbs-status-box', `
       <div class="ghbs-card-header">🔌 Status</div>
-      <div class="ghbs-status-body">${tags}</div>
+      <div class="ghbs-status-body">${rows}</div>
     `);
   }
 
   function buildStickyNote() {
     const msg = randomFrom(STICKY_MESSAGES);
     return el('div', 'ghbs-card ghbs-sticky-note', `
-      <div class="ghbs-sticky-pin">📌</div>
-      <div class="ghbs-sticky-content">${msg}</div>
+      <div class="ghbs-card-header">📌 Podsjetnik</div>
+      <div class="ghbs-sticky-body">
+        <div class="ghbs-sticky-content">${msg}</div>
+      </div>
     `);
   }
 
+  function buildCommitGenerator() {
+    const container = el('div', 'ghbs-card ghbs-commit-generator');
+    container.innerHTML = `
+      <div class="ghbs-card-header">💻 Balkan Commit</div>
+      <div class="ghbs-commit-body">
+        <div class="ghbs-commit-display-container">
+          <code class="ghbs-commit-text">${randomFrom(BALKAN_COMMITS)}</code>
+        </div>
+        <div class="ghbs-commit-actions">
+          <button class="ghbs-btn-action ghbs-commit-generate-btn">🔄 Generiši</button>
+          <button class="ghbs-btn-action ghbs-commit-copy-btn">📋 Kopiraj</button>
+        </div>
+      </div>
+    `;
+
+    const generateBtn = container.querySelector('.ghbs-commit-generate-btn');
+    const copyBtn = container.querySelector('.ghbs-commit-copy-btn');
+    const commitText = container.querySelector('.ghbs-commit-text');
+
+    generateBtn.addEventListener('click', () => {
+      commitText.textContent = randomFrom(BALKAN_COMMITS);
+      copyBtn.textContent = '📋 Kopiraj';
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const text = commitText.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.textContent = '✅ Kopirano!';
+      }).catch(err => {
+        log('Failed to copy text: ', err);
+      });
+    });
+
+    return container;
+  }
+
   function buildTrendingWidget() {
+    const repos = MOCK_TRENDING_REPOS.map(
+      (repo) => `
+        <div class="ghbs-trending-repo">
+          <div class="ghbs-trending-repo-title">
+            <span class="ghbs-trending-repo-icon">📦</span>
+            <a href="#" class="ghbs-trending-repo-name">${repo.name}</a>
+          </div>
+          <p class="ghbs-trending-repo-desc">${repo.desc}</p>
+          <div class="ghbs-trending-repo-meta">
+            <span class="ghbs-trending-repo-lang">
+              <span class="ghbs-trending-repo-lang-dot" style="background-color: ${repo.langColor}"></span>
+              ${repo.lang}
+            </span>
+            <span class="ghbs-trending-repo-stars">⭐ ${repo.stars}</span>
+          </div>
+        </div>
+      `
+    ).join('');
     return el('div', 'ghbs-card ghbs-trending-widget', `
       <div class="ghbs-card-header">🔥 Popularni repozitoriji</div>
-      <div class="ghbs-trending-body">
-        <p class="ghbs-trending-placeholder">GitHub Trending</p>
-      </div>
+      <div class="ghbs-trending-body">${repos}</div>
     `);
   }
 
@@ -176,22 +262,16 @@
       return;
     }
 
-    // --- Sidebar Injection (Stats, Status, Trending) ---
+    // --- Sidebar Injection (Stats, Commit Gen) ---
     if (sidebar && !document.querySelector('.ghbs-sidebar-widgets')) {
       const sidebarContainer = el('div', 'ghbs-sidebar-widgets');
       sidebarContainer.appendChild(buildChartWidget());
-      sidebarContainer.appendChild(buildStatusBox());
-      sidebarContainer.appendChild(buildTrendingWidget());
+      sidebarContainer.appendChild(buildCommitGenerator());
       
-      const repoList = sidebar.querySelector('.filter-list, [data-testid="dashboard-repos"]');
-      if (repoList) {
-        repoList.parentNode.insertBefore(sidebarContainer, repoList.nextSibling);
-      } else {
-        sidebar.appendChild(sidebarContainer);
-      }
+      sidebar.appendChild(sidebarContainer);
     }
 
-    // --- Main Feed Injection (Welcome, Weather, Proverbs) ---
+    // --- Main Feed Injection (Welcome, Weather, Proverbs, Sticky Note) ---
     if (newsFeed && !document.querySelector('.ghbs-feed-widgets')) {
       const feedContainer = el('div', 'ghbs-feed-widgets');
       feedContainer.appendChild(buildWelcomeBanner());
@@ -199,10 +279,51 @@
       const topGrid = el('div', 'ghbs-widgets-grid');
       topGrid.appendChild(buildWeatherWidget());
       topGrid.appendChild(buildQuoteCard());
-      topGrid.appendChild(buildQuoteCard()); // Second proverb widget
+      topGrid.appendChild(buildStickyNote());
       
       feedContainer.appendChild(topGrid);
       newsFeed.prepend(feedContainer);
+    }
+
+    // --- Right Column Status Injection (beneath changelog) ---
+    if (!document.querySelector('.ghbs-status-box')) {
+      const changelogHeader = Array.from(document.querySelectorAll('h2, h3, [data-content="Latest from our changelog"], .f5.text-bold'))
+        .find(el => el.textContent.includes('Latest from our changelog') || el.textContent.includes('Najnovije iz dnevnika promjena'));
+
+      if (changelogHeader) {
+        const container = changelogHeader.closest('.Box, .Box-row, [data-testid="changelog-container"]') || changelogHeader.parentElement;
+        if (container && container.parentNode) {
+          const statusBox = buildStatusBox();
+          statusBox.style.marginTop = '16px';
+          container.parentNode.insertBefore(statusBox, container.nextSibling);
+          log('Status box injected beneath changelog');
+        }
+      }
+    }
+
+    // --- Right Column Trending Injection (beneath status box) ---
+    if (!document.querySelector('.ghbs-trending-widget')) {
+      const statusBox = document.querySelector('.ghbs-status-box');
+      if (statusBox && statusBox.parentNode) {
+        const trendingWidget = buildTrendingWidget();
+        trendingWidget.style.marginTop = '16px';
+        statusBox.parentNode.insertBefore(trendingWidget, statusBox.nextSibling);
+        log('Trending widget injected beneath status box');
+      } else {
+        // Fallback: if statusBox is not found, try to inject beneath changelog
+        const changelogHeader = Array.from(document.querySelectorAll('h2, h3, [data-content="Latest from our changelog"], .f5.text-bold'))
+          .find(el => el.textContent.includes('Latest from our changelog') || el.textContent.includes('Najnovije iz dnevnika promjena'));
+        
+        if (changelogHeader) {
+          const container = changelogHeader.closest('.Box, .Box-row, [data-testid="changelog-container"]') || changelogHeader.parentElement;
+          if (container && container.parentNode) {
+            const trendingWidget = buildTrendingWidget();
+            trendingWidget.style.marginTop = '16px';
+            container.parentNode.insertBefore(trendingWidget, container.nextSibling);
+            log('Trending widget injected beneath changelog (status box fallback)');
+          }
+        }
+      }
     }
 
     // --- Footer Injection ---
@@ -258,7 +379,6 @@
             el.setAttribute(attr, text);
           }
         } else {
-          // Safe text replacement to avoid destroying React SVG children
           let hasUpdated = false;
           Array.from(el.childNodes).forEach(node => {
             if (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0) {
@@ -275,7 +395,6 @@
       });
     });
 
-    // Explicitly target the "New" repository button using the exact structure
     document.querySelectorAll('a[href="/new"] .Button-label, a[href^="/new"] .Button-label').forEach(el => {
       Array.from(el.childNodes).forEach(node => {
         if (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === 'New') {
@@ -321,7 +440,6 @@
       'Feature preview': 'Pregled novih opcija',
       'Help': 'Pomoć',
       'Type / to search': 'Pritisni / za pretragu',
-      // Changelog specific
       'New enterprise installation API now in public preview': 'Novi enterprise installation API je sada u javnom pregledu',
       'Start Copilot cloud agent tasks via the REST API': 'Pokrenite Copilot cloud agent zadatke putem REST API-ja',
       'GitHub Enterprise Server 3.21 release candidate is available': 'GitHub Enterprise Server 3.21 release candidate je dostupan',
@@ -428,8 +546,18 @@
     });
   }
 
+  function injectCrochet() {
+    if (!document.querySelector('.ghbs-crochet')) {
+      const crochet = el('div', 'ghbs-crochet');
+      crochet.style.backgroundImage = `url('${chrome.runtime.getURL('crochet.png')}')`;
+      document.body.appendChild(crochet);
+      log('Crochet doily injected at top of page');
+    }
+  }
+
   function scanAndInject() {
     injectWidgets();
+    injectCrochet();
   }
 
 
@@ -502,12 +630,13 @@
     const observer = new MutationObserver((mutations) => {
       let needsUpdate = false;
       for (const m of mutations) {
-        if (m.type === 'childList' && m.addedNodes.length > 0) {
+        if (m.addedNodes.length > 0) {
           needsUpdate = true;
           break;
         }
       }
       if (needsUpdate) {
+        scanAndInject();
         localizeUI();
         enhanceActivityFeed();
       }

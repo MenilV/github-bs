@@ -243,11 +243,20 @@ body.ghbs-active .ghbs-card {
   border-radius: var(--ghbs-radius);
   padding: 14px;
   box-shadow: var(--ghbs-shadow);
-  transition: box-shadow var(--ghbs-transition), transform var(--ghbs-transition);
+  transition: box-shadow var(--ghbs-transition), transform var(--ghbs-transition), border-color var(--ghbs-transition);
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+body.ghbs-active .ghbs-widgets-grid .ghbs-card {
+  height: 100% !important;
 }
 
 body.ghbs-active .ghbs-card:hover {
-  box-shadow: var(--ghbs-shadow-lg);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.12), 0 2px 8px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+  border-color: var(--ghbs-accent-light) !important;
 }
 
 body.ghbs-active .ghbs-card-header {
@@ -270,6 +279,7 @@ body.ghbs-active .ghbs-weather-widget .ghbs-weather-body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-grow: 1;
 }
 
 body.ghbs-active .ghbs-weather-widget .ghbs-weather-icon {
@@ -300,20 +310,21 @@ body.ghbs-active .ghbs-weather-widget .ghbs-weather-location {
 /* ── Quote Card ── */
 
 body.ghbs-active .ghbs-quote-card {
-  background: rgba(245, 158, 11, 0.04) !important;
+  background: rgba(245, 158, 11, 0.03) !important;
   border: 1px dashed var(--ghbs-accent-dim) !important;
   transform: rotate(-0.5deg);
-  position: relative;
-  padding-top: 22px;
 }
 
-body.ghbs-active .ghbs-quote-pin {
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 16px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+body.ghbs-active .ghbs-quote-card:hover {
+  transform: rotate(0deg) translateY(-2px);
+}
+
+body.ghbs-active .ghbs-quote-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  flex-grow: 1 !important;
+  gap: 8px;
 }
 
 body.ghbs-active .ghbs-quote-text {
@@ -322,6 +333,10 @@ body.ghbs-active .ghbs-quote-text {
   color: var(--ghbs-text-muted);
   line-height: 1.5;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
 }
 
 body.ghbs-active .ghbs-quote-attribution {
@@ -374,31 +389,25 @@ body.ghbs-active .ghbs-welcome-subtitle {
 /* ── Chart Widget ── */
 
 body.ghbs-active .ghbs-chart-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-body.ghbs-active .ghbs-chart-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 36px;
-  align-items: center;
-  gap: 6px;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
+  row-gap: 8px !important;
+  column-gap: 10px !important;
 }
 
 body.ghbs-active .ghbs-chart-label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--ghbs-text-muted);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 body.ghbs-active .ghbs-chart-bar-track {
-  height: 5px;
+  height: 6px;
   background: var(--ghbs-border);
   border-radius: 3px;
   overflow: hidden;
+  min-width: 60px;
 }
 
 body.ghbs-active .ghbs-chart-bar-fill {
@@ -409,7 +418,7 @@ body.ghbs-active .ghbs-chart-bar-fill {
 }
 
 body.ghbs-active .ghbs-chart-value {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--ghbs-text-dim);
   text-align: right;
   font-weight: 600;
@@ -418,64 +427,97 @@ body.ghbs-active .ghbs-chart-value {
 /* ── Status Box ── */
 
 body.ghbs-active .ghbs-status-body {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  display: grid !important;
+  grid-template-columns: auto 1fr !important;
+  align-items: center !important;
+  row-gap: 8px !important;
+  column-gap: 16px !important;
 }
 
-body.ghbs-active .ghbs-status-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 8px;
-  border-radius: 9999px;
+body.ghbs-active .ghbs-status-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ghbs-text-muted);
+}
+
+body.ghbs-active .ghbs-status-value-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  justify-content: flex-end !important;
+}
+
+body.ghbs-active .ghbs-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+body.ghbs-active .ghbs-status-dot-green {
+  background-color: var(--ghbs-success);
+  box-shadow: 0 0 8px var(--ghbs-success);
+}
+
+body.ghbs-active .ghbs-status-dot-yellow {
+  background-color: var(--ghbs-accent);
+  box-shadow: 0 0 8px var(--ghbs-accent);
+}
+
+body.ghbs-active .ghbs-status-dot-red {
+  background-color: var(--ghbs-danger);
+  box-shadow: 0 0 8px var(--ghbs-danger);
+}
+
+body.ghbs-active .ghbs-status-dot-purple {
+  background-color: var(--ghbs-purple);
+  box-shadow: 0 0 8px var(--ghbs-purple);
+}
+
+body.ghbs-active .ghbs-status-text {
   font-size: 10px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 body.ghbs-active .ghbs-status-green {
-  background: rgba(34, 197, 94, 0.15);
   color: var(--ghbs-success) !important;
-  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 body.ghbs-active .ghbs-status-yellow {
-  background: var(--ghbs-yellow-bg);
   color: var(--ghbs-accent) !important;
-  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 body.ghbs-active .ghbs-status-red {
-  background: rgba(239, 68, 68, 0.15);
   color: var(--ghbs-danger) !important;
-  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 body.ghbs-active .ghbs-status-blue {
-  background: rgba(59, 130, 246, 0.15);
   color: var(--ghbs-info) !important;
-  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 body.ghbs-active .ghbs-status-purple {
-  background: rgba(168, 85, 247, 0.15);
   color: var(--ghbs-purple) !important;
-  border: 1px solid rgba(168, 85, 247, 0.3);
 }
 
 /* ── Sticky Note ── */
 
 body.ghbs-active .ghbs-sticky-note {
-  background: rgba(251, 191, 36, 0.08) !important;
-  border: 1px solid var(--ghbs-accent-dim) !important;
+  background: rgba(251, 191, 36, 0.05) !important;
+  border: 1px dashed var(--ghbs-accent-dim) !important;
   transform: rotate(0.8deg);
-  position: relative;
 }
 
-body.ghbs-active .ghbs-sticky-pin {
-  text-align: center;
-  font-size: 13px;
-  margin-bottom: 6px;
+body.ghbs-active .ghbs-sticky-note:hover {
+  transform: rotate(0deg) translateY(-2px);
+}
+
+body.ghbs-active .ghbs-sticky-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  flex-grow: 1 !important;
 }
 
 body.ghbs-active .ghbs-sticky-content {
@@ -489,15 +531,73 @@ body.ghbs-active .ghbs-sticky-content {
 /* ── Trending Widget ── */
 
 body.ghbs-active .ghbs-trending-body {
-  min-height: 30px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
 }
 
-body.ghbs-active .ghbs-trending-placeholder {
+body.ghbs-active .ghbs-trending-repo {
+  border-bottom: 1px solid var(--ghbs-border);
+  padding-bottom: 10px;
+}
+
+body.ghbs-active .ghbs-trending-repo:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+body.ghbs-active .ghbs-trending-repo-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-bottom: 4px !important;
+}
+
+body.ghbs-active .ghbs-trending-repo-icon {
+  font-size: 12px;
+}
+
+body.ghbs-active .ghbs-trending-repo-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ghbs-accent) !important;
+  text-decoration: none;
+}
+
+body.ghbs-active .ghbs-trending-repo-name:hover {
+  text-decoration: underline;
+}
+
+body.ghbs-active .ghbs-trending-repo-desc {
   font-size: 11px;
+  color: var(--ghbs-text-muted) !important;
+  margin: 0 0 6px 0 !important;
+  line-height: 1.4;
+}
+
+body.ghbs-active .ghbs-trending-repo-meta {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 10px;
   color: var(--ghbs-text-dim);
-  text-align: center;
-  margin: 0;
-  padding: 6px 0;
+}
+
+body.ghbs-active .ghbs-trending-repo-lang {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+body.ghbs-active .ghbs-trending-repo-lang-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+body.ghbs-active .ghbs-trending-repo-stars {
+  display: inline-block;
 }
 
 /* ── Badge System ── */
@@ -1048,4 +1148,77 @@ body.ghbs-active .Link--secondary:hover {
   body.ghbs-active #ghbs-welcome-banner {
     display: none !important;
   }
+}
+
+/* ── Crochet Doily (Tabletić) ── */
+
+body.ghbs-active .ghbs-crochet {
+  position: fixed !important;
+  top: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(-50%) !important;
+  width: 280px !important;
+  height: 280px !important;
+  background-size: contain !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  mix-blend-mode: screen !important;
+  pointer-events: none !important;
+  z-index: 100000 !important;
+  opacity: 0.9 !important;
+}
+
+/* ── Commit Generator ── */
+
+body.ghbs-active .ghbs-commit-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+body.ghbs-active .ghbs-commit-display-container {
+  background: var(--ghbs-bg-alt) !important;
+  border: 1px solid var(--ghbs-border) !important;
+  border-radius: var(--ghbs-radius-sm) !important;
+  padding: 10px !important;
+  min-height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+body.ghbs-active .ghbs-commit-text {
+  font-family: monospace !important;
+  font-size: 11px !important;
+  color: var(--ghbs-accent-light) !important;
+  word-break: break-word !important;
+}
+
+body.ghbs-active .ghbs-commit-actions {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+body.ghbs-active .ghbs-btn-action {
+  flex: 1 !important;
+  background: var(--ghbs-surface-alt) !important;
+  border: 1px solid var(--ghbs-border) !important;
+  color: var(--ghbs-text) !important;
+  border-radius: var(--ghbs-radius-sm) !important;
+  padding: 6px 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background var(--ghbs-transition), border-color var(--ghbs-transition), transform 100ms ease !important;
+}
+
+body.ghbs-active .ghbs-btn-action:hover {
+  background: var(--ghbs-surface-hover) !important;
+  border-color: var(--ghbs-accent) !important;
+  color: var(--ghbs-accent) !important;
+}
+
+body.ghbs-active .ghbs-btn-action:active {
+  transform: scale(0.96) !important;
 }
