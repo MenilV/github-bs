@@ -64,6 +64,19 @@
     { label: 'Popijenih kafa', value: 78 },
   ];
 
+  const COFFEE_TIMES = [10, 13, 16];
+
+  const GRANDMA_ADVICE = [
+    'Džezva je pristavljena, izdrži sine! ☕',
+    'Kafa se ne pije na brzinu, polako s tim kodom.',
+    'Propuh u kodu, zatvori prozore i skuhaj jednu.',
+    'Ko rano rani, tri kafe popije.',
+    'Uzdahni, popij vode, kafa samo što nije.',
+    'Bez kafe nema rada, a bez rada nema pite. 🥧',
+    'Ako ti se spava, nisi dovoljno kafa popio.',
+    'Sastanak može čekati, kafa ne može.'
+  ];
+
   const MOCK_TRENDING_REPOS = [
     { name: 'cevap-api', desc: 'REST API za naručivanje desetke u pola s lukom.', stars: '132', lang: 'Go', langColor: '#00ADD8' },
     { name: 'rakija-blockchain', desc: 'Decentralizovani konsenzus za destilaciju šljive.', stars: '98', lang: 'Rust', langColor: '#deb887' },
@@ -182,6 +195,88 @@
     `);
   }
 
+  function getNextCoffeeTime() {
+    const now = new Date();
+    const currentHour = now.getHours() + now.getMinutes() / 60;
+    
+    let targetHour = COFFEE_TIMES.find(h => h > currentHour);
+    let isTomorrow = false;
+    
+    if (targetHour === undefined) {
+      targetHour = COFFEE_TIMES[0];
+      isTomorrow = true;
+    }
+    
+    const targetDate = new Date();
+    if (isTomorrow) {
+      targetDate.setDate(targetDate.getDate() + 1);
+    }
+    targetDate.setHours(targetHour, 0, 0, 0);
+    
+    const diffMs = targetDate - now;
+    const diffMin = Math.round(diffMs / 1000 / 60);
+    const hours = Math.floor(diffMin / 60);
+    const mins = diffMin % 60;
+    
+    const maxIntervalMin = 180;
+    const progressPercent = Math.max(0, Math.min(100, ((maxIntervalMin - diffMin) / maxIntervalMin) * 100));
+    
+    return { hours, mins, progressPercent };
+  }
+
+  function buildCoffeeTracker() {
+    const { hours, mins, progressPercent } = getNextCoffeeTime();
+    
+    let timeText = '';
+    if (hours > 0) {
+      timeText = `Još ${hours} h i ${mins} min`;
+    } else {
+      timeText = `Još ${mins} minuta`;
+    }
+    if (hours === 0 && mins === 0) {
+      timeText = 'VRIJEME JE ZA KAFICU! ☕';
+    }
+    
+    const advice = randomFrom(GRANDMA_ADVICE);
+    
+    const container = el('div', 'ghbs-card ghbs-coffee-tracker');
+    container.innerHTML = `
+      <div class="ghbs-card-header">☕ Do kafe</div>
+      <div class="ghbs-coffee-body">
+        <div class="ghbs-coffee-countdown">${timeText}</div>
+        <div class="ghbs-coffee-progress-track">
+          <div class="ghbs-coffee-progress-fill" style="width: ${hours === 0 && mins === 0 ? 100 : progressPercent}%"></div>
+        </div>
+        <div class="ghbs-coffee-advice">"${advice}"</div>
+      </div>
+    `;
+    
+    const interval = setInterval(() => {
+      if (!document.body.contains(container)) {
+        clearInterval(interval);
+        return;
+      }
+      const data = getNextCoffeeTime();
+      const countdownEl = container.querySelector('.ghbs-coffee-countdown');
+      const fillEl = container.querySelector('.ghbs-coffee-progress-fill');
+      
+      let nextText = '';
+      if (data.hours > 0) {
+        nextText = `Još ${data.hours} h i ${data.mins} min`;
+      } else {
+        nextText = `Još ${data.mins} minuta`;
+      }
+      if (data.hours === 0 && data.mins === 0) {
+        nextText = 'VRIJEME JE ZA KAFICU! ☕';
+      }
+      
+      if (countdownEl) countdownEl.textContent = nextText;
+      if (fillEl) fillEl.style.width = `${data.hours === 0 && data.mins === 0 ? 100 : data.progressPercent}%`;
+    }, 60000);
+    
+    return container;
+  }
+
   function buildCommitGenerator() {
     const container = el('div', 'ghbs-card ghbs-commit-generator');
     container.innerHTML = `
@@ -262,11 +357,12 @@
       return;
     }
 
-    // --- Sidebar Injection (Stats, Commit Gen) ---
+    // --- Sidebar Injection (Stats, Commit Gen, Coffee Tracker) ---
     if (sidebar && !document.querySelector('.ghbs-sidebar-widgets')) {
       const sidebarContainer = el('div', 'ghbs-sidebar-widgets');
       sidebarContainer.appendChild(buildChartWidget());
       sidebarContainer.appendChild(buildCommitGenerator());
+      sidebarContainer.appendChild(buildCoffeeTracker());
       
       sidebar.appendChild(sidebarContainer);
     }

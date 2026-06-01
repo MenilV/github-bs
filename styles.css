@@ -1222,3 +1222,42 @@ body.ghbs-active .ghbs-btn-action:hover {
 body.ghbs-active .ghbs-btn-action:active {
   transform: scale(0.96) !important;
 }
+
+/* ── Coffee Tracker ── */
+
+body.ghbs-active .ghbs-coffee-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+body.ghbs-active .ghbs-coffee-countdown {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--ghbs-accent-light) !important;
+  text-align: center !important;
+  margin: 4px 0 !important;
+}
+
+body.ghbs-active .ghbs-coffee-progress-track {
+  height: 8px !important;
+  background: var(--ghbs-border) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
+}
+
+body.ghbs-active .ghbs-coffee-progress-fill {
+  height: 100% !important;
+  border-radius: 4px !important;
+  background: linear-gradient(90deg, var(--ghbs-accent-dim), var(--ghbs-accent)) !important;
+  transition: width 1s ease !important;
+}
+
+body.ghbs-active .ghbs-coffee-advice {
+  font-size: 11px !important;
+  color: var(--ghbs-text-muted) !important;
+  text-align: center !important;
+  font-style: italic !important;
+  line-height: 1.4 !important;
+  margin-top: 4px !important;
+}
