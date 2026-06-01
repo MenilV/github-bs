@@ -341,7 +341,7 @@
   function buildFooter() {
     return el('div', 'ghbs-footer', `
       <div class="ghbs-footer-inner">
-        <span class="ghbs-footer-brand">git.ba</span>
+        <span class="ghbs-footer-brand">Bosanski Github</span>
         <span class="ghbs-footer-tagline">Štampano u Bosni 🇧🇦</span>
         <span class="ghbs-footer-copy">© ${new Date().getFullYear()} — Ćevapi open source</span>
       </div>
