@@ -1341,3 +1341,20 @@ body.ghbs-active .ghbs-warning-bribe-btn:hover {
 body.ghbs-active .ghbs-warning-bribe-btn:active {
   transform: scale(0.96) !important;
 }
+
+/* ── Bosnian Flag Corner Background Watermark ── */
+body.ghbs-active::after {
+  content: "" !important;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 180px !important;
+  height: 180px !important;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNTAnIGhlaWdodD0nMTUwJyB2aWV3Qm94PScwIDAgMTUwIDE1MCc+PHBvbHlnb24gcG9pbnRzPScxNTAsMCAxNTAsMTUwIDAsMCcgZmlsbD0nIzAwMkY2QycvPjxwb2x5Z29uIHBvaW50cz0nMTUwLDAgMTUwLDExMCA0MCwwJyBmaWxsPScjRkVDQjAwJy8+PGcgZmlsbD0nI0ZGRkZGRic+PHBvbHlnb24gcG9pbnRzPScyNSwyMCAyOCwyNiAzNSwyNiAzMCwzMCAzMiwzNiAyNSwzMiAxOCwzNiAyMCwzMCAxNSwyNiAyMiwyNicgdHJhbnNmb3JtPSd0cmFuc2xhdGUoMTAsIDEwKSBzY2FsZSgwLjYpJy8+PHBvbHlnb24gcG9pbnRzPScyNSwyMCAyOCwyNiAzNSwyNiAzMCwzMCAzMiwzNiAyNSwzMiAxOCwzNiAyMCwzMCAxNSwyNiAyMiwyNicgdHJhbnNmb3JtPSd0cmFuc2xhdGUoMzUsIDM1KSBzY2FsZSgwLjYpJy8+PHBvbHlnb24gcG9pbnRzPScyNSwyMCAyOCwyNiAzNSwyNiAzMCwzMCAzMiwzNiAyNSwzMiAxOCwzNiAyMCwzMCAxNSwyNiAyMiwyNicgdHJhbnNmb3JtPSd0cmFuc2xhdGUoNjAsIDYwKSBzY2FsZSgwLjYpJy8+PHBvbHlnb24gcG9pbnRzPScyNSwyMCAyOCwyNiAzNSwyNiAzMCwzMCAzMiwzNiAyNSwzMiAxOCwzNiAyMCwzMCAxNSwyNiAyMiwyNicgdHJhbnNmb3JtPSd0cmFuc2xhdGUoODUsIDg1KSBzY2FsZSgwLjYpJy8+PHBvbHlnb24gcG9pbnRzPScyNSwyMCAyOCwyNiAzNSwyNiAzMCwzMCAzMiwzNiAyNSwzMiAxOCwzNiAyMCwzMCAxNSwyNiAyMiwyNicgdHJhbnNmb3JtPSd0cmFuc2xhdGUoMTEwLCAxMTApIHNjYWxlKDAuNiknLz48L2c+PC9zdmc+") !important;
+  background-size: contain !important;
+  background-position: top right !important;
+  background-repeat: no-repeat !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+  opacity: 0.15 !important;
+}
