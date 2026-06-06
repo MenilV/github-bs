@@ -16,6 +16,7 @@
     'Gdje ima dima, ima i ćevapa.',
     'Šta možeš danas, nemoj ostavljati za sutra.',
     'Bez muke nema nauke — ni ćevapa bez ražnja.',
+    'Šta’š ti, ma ne znaš ti to.',
   ];
 
   const STICKY_MESSAGES = [
@@ -53,7 +54,8 @@
     'feat: ubacio bureka sa sirom da nerviram sarajlije',
     'fix: maknuo bag da šef ne galami',
     'WIP: radim al sporo',
-    'fix: vratio kako je bilo prije nego što sam pokvario'
+    'fix: vratio kako je bilo prije nego što sam pokvario',
+    'chore: Fikro otišao u peMziju, zaboravio obrisati logove s AI accounta'
   ];
 
   const CHART_DATA = [
@@ -74,7 +76,8 @@
     'Uzdahni, popij vode, kafa samo što nije.',
     'Bez kafe nema rada, a bez rada nema pite. 🥧',
     'Ako ti se spava, nisi dovoljno kafa popio.',
-    'Sastanak može čekati, kafa ne može.'
+    'Sastanak može čekati, kafa ne može.',
+    'Ako Fikro može u peMziju, možeš i ti na pauzu.'
   ];
 
   const MOCK_TRENDING_REPOS = [
