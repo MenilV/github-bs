@@ -1,5 +1,6 @@
 const fs = require('fs');
-const chromeWebstoreUpload = require('chrome-webstore-upload');
+const chromeWebstoreUploadRaw = require('chrome-webstore-upload');
+const chromeWebstoreUpload = chromeWebstoreUploadRaw.default || chromeWebstoreUploadRaw;
 
 // Read configurations from environment variables for security.
 // Fallback extension ID is set to your specified extension ID.
