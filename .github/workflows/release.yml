@@ -44,13 +44,14 @@ jobs:
         run: |
           zip -r github-bs.zip manifest.json content.js styles.css crochet.png icons
 
-      - name: Upload to Chrome Web Store
-        uses: mnao305/chrome-extension-upload@v6.0.0
-        with:
-          file-path: github-bs.zip
-          extension-id: ${{ secrets.EXTENSION_ID }}
-          client-id: ${{ secrets.CLIENT_ID }}
-          client-secret: ${{ secrets.CLIENT_SECRET }}
-          refresh-token: ${{ secrets.REFRESH_TOKEN }}
-          publish: true
+      - name: Install Release Dependencies
+        run: npm install chrome-webstore-upload
+
+      - name: Upload and Publish to Chrome Web Store
+        run: node release.js
+        env:
+          EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
 

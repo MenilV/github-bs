@@ -103,7 +103,7 @@ try {
 }
 
 // 4. Check syntax of Javascript files using node --check
-const jsFiles = ['content.js', 'bump-version.js', 'test.js'];
+const jsFiles = ['content.js', 'bump-version.js', 'test.js', 'release.js'];
 jsFiles.forEach(file => {
   try {
     const fullPath = path.join(__dirname, file);
