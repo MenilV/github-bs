@@ -48,9 +48,10 @@ Ovaj projekat koristi GitHub Actions za automatsku objavu novih verzija na Chrom
 Da bi automatska objava radila, u postavkama GitHub repozitorija (`Settings` -> `Secrets and variables` -> `Actions`) morate dodati sljedeće tajne:
 
 1.  **`EXTENSION_ID`**: ID vaše ekstenzije na Chrome Web Store Developer konzoli.
-2.  **`CLIENT_ID`**: Google API OAuth2 Client ID.
-3.  **`CLIENT_SECRET`**: Google API OAuth2 Client Secret.
-4.  **`REFRESH_TOKEN`**: OAuth2 Refresh Token za pristup Chrome Web Store API-ju.
+2.  **`PUBLISHER_ID`**: ID vašeg izdavačkog računa (developer account), koji se nalazi u URL-u Chrome Web Store Developer konzole.
+3.  **`CLIENT_ID`**: Google API OAuth2 Client ID.
+4.  **`CLIENT_SECRET`**: Google API OAuth2 Client Secret.
+5.  **`REFRESH_TOKEN`**: OAuth2 Refresh Token za pristup Chrome Web Store API-ju.
 
 Za više informacija o tome kako generisati ove ključeve, pogledajte [službenu dokumentaciju za Chrome Web Store API](https://developer.chrome.com/docs/webstore/using_api/).
 

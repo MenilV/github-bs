@@ -6,6 +6,7 @@ const chromeWebstoreUpload = chromeWebstoreUploadRaw.default || chromeWebstoreUp
 // Fallback extension ID is set to your specified extension ID.
 const store = chromeWebstoreUpload({
   extensionId: process.env.EXTENSION_ID || 'ecnglinljpjkbgmdpeiglonddahpbkeb',
+  publisherId: process.env.PUBLISHER_ID,
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   refreshToken: process.env.REFRESH_TOKEN,
