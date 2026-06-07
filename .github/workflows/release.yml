@@ -45,7 +45,7 @@ jobs:
           zip -r github-bs.zip manifest.json content.js styles.css crochet.png icons
 
       - name: Upload to Chrome Web Store
-        uses: fregante/chrome-webstore-upload@v2
+        uses: mnao305/chrome-extension-upload@v6.0.0
         with:
           file-path: github-bs.zip
           extension-id: ${{ secrets.EXTENSION_ID }}
