@@ -39,6 +39,7 @@ jobs:
         run: |
           git add manifest.json
           git commit -m "chore(release): bump version [skip ci]" || echo "No changes to commit"
+          git pull --rebase origin main
           git push origin main
 
       - name: Zip Extension Files
