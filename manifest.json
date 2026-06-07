@@ -1,15 +1,24 @@
 {
   "manifest_version": 3,
   "name": "GitHub BS",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Bosanski skin za GitHub — ćevapi, rakija i pull requestovi",
   "homepage_url": "https://github.com/menilvukovic/github-bs",
-  "host_permissions": ["*://github.com/*"],
+  "host_permissions": [
+    "*://github.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["*://github.com/", "*://github.com/dashboard"],
-      "js": ["content.js"],
-      "css": ["styles.css"],
+      "matches": [
+        "*://github.com/",
+        "*://github.com/dashboard"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -20,8 +29,12 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["crochet.png"],
-      "matches": ["*://github.com/*"]
+      "resources": [
+        "crochet.png"
+      ],
+      "matches": [
+        "*://github.com/*"
+      ]
     }
   ]
 }
