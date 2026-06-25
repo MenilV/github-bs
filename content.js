@@ -438,17 +438,26 @@
     }
 
     // --- Right Column Status Injection (beneath changelog) ---
+    // Primary anchor is the right-rail changelog panel. GitHub drops that panel
+    // on narrower widths / layout changes, so when it's missing we relocate the
+    // widget into the left sidebar instead of letting it silently disappear.
     if (!document.querySelector('.ghbs-status-box')) {
       const changelogHeader = Array.from(document.querySelectorAll('h2, h3, [data-content="Latest from our changelog"], .f5.text-bold'))
         .find(el => el.textContent.includes('Latest from our changelog') || el.textContent.includes('Najnovije iz dnevnika promjena'));
+      const changelogContainer = changelogHeader
+        && (changelogHeader.closest('.Box, .Box-row, [data-testid="changelog-container"]') || changelogHeader.parentElement);
 
-      if (changelogHeader) {
-        const container = changelogHeader.closest('.Box, .Box-row, [data-testid="changelog-container"]') || changelogHeader.parentElement;
-        if (container && container.parentNode) {
-          const statusBox = buildStatusBox();
-          statusBox.style.marginTop = '16px';
-          container.parentNode.insertBefore(statusBox, container.nextSibling);
-          log('Status box injected beneath changelog');
+      if (changelogContainer && changelogContainer.parentNode) {
+        const statusBox = buildStatusBox();
+        statusBox.style.marginTop = '16px';
+        changelogContainer.parentNode.insertBefore(statusBox, changelogContainer.nextSibling);
+        log('Status box injected beneath changelog');
+      } else {
+        // No right rail — fall back to the left sidebar so it stays visible.
+        const sidebarWidgets = document.querySelector('.ghbs-sidebar-widgets');
+        if (sidebarWidgets) {
+          sidebarWidgets.appendChild(buildStatusBox());
+          log('Status box fell back to left sidebar (no changelog anchor)');
         }
       }
     }
@@ -649,31 +658,7 @@
 
     newsItems.forEach((item) => {
       if (item.classList.contains('ghbs-enhanced')) return;
-
-      const classes = item.className;
-      let badgeType = 'blue';
-      let badgeLabel = 'PR';
-
-      if (classes.includes('push')) { badgeType = 'green'; badgeLabel = 'Push'; }
-      else if (classes.includes('issues') || classes.includes('issue')) { badgeType = 'purple'; badgeLabel = 'Issue'; }
-      else if (classes.includes('pull_request') || classes.includes('pull-request')) { badgeType = 'blue'; badgeLabel = 'PR'; }
-      else if (classes.includes('star')) { badgeType = 'yellow'; badgeLabel = 'Star'; }
-      else if (classes.includes('fork')) { badgeType = 'green'; badgeLabel = 'Fork'; }
-      else if (classes.includes('release') || classes.includes('tag')) { badgeType = 'green'; badgeLabel = 'Release'; }
-      else if (classes.includes('comment')) { badgeType = 'blue'; badgeLabel = 'Komentar'; }
-      else if (classes.includes('member') || classes.includes('team')) { badgeType = 'purple'; badgeLabel = 'Tim'; }
-      else if (classes.includes('create')) { badgeType = 'green'; badgeLabel = 'Kreirano'; }
-      else if (classes.includes('delete')) { badgeType = 'red'; badgeLabel = 'Obrisano'; }
-
-      item.classList.add('ghbs-enhanced', 'ghbs-feed-item', `ghbs-feed-${badgeType}`);
-
-      // The badge is positioned absolutely (top-right) via CSS, so it can be
-      // appended anywhere without disturbing GitHub's own flex layout. We avoid
-      // inserting it before a guessed title node, which previously landed the
-      // badge in front of the actor avatar and broke alignment.
-      if (!item.querySelector('.ghbs-badge')) {
-        item.appendChild(el('span', `ghbs-badge ghbs-badge-${badgeType}`, badgeLabel));
-      }
+      item.classList.add('ghbs-enhanced', 'ghbs-feed-item');
 
       const time = item.querySelector('relative-time, time');
       if (time) time.classList.add('ghbs-time');

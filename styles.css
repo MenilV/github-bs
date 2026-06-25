@@ -786,14 +786,10 @@ body.ghbs-active .ghbs-badge-yellow {
 /* ── Feed Items ── */
 
 body.ghbs-active .ghbs-feed-item {
-  position: relative !important;
   background: var(--ghbs-surface) !important;
   border: 1px solid var(--ghbs-border) !important;
-  border-left: 3px solid var(--ghbs-border-light) !important;
   border-radius: var(--ghbs-radius);
   padding: 12px 14px !important;
-  /* Reserve room on the right so item content never runs under the badge. */
-  padding-right: 84px !important;
   margin-bottom: 8px !important;
   box-shadow: var(--ghbs-shadow);
   transition: box-shadow var(--ghbs-transition), border-color var(--ghbs-transition);
@@ -802,22 +798,6 @@ body.ghbs-active .ghbs-feed-item {
 body.ghbs-active .ghbs-feed-item:hover {
   border-color: var(--ghbs-border-light) !important;
   box-shadow: var(--ghbs-shadow-lg);
-}
-
-/* Color-coded left accent keyed to the activity type. */
-body.ghbs-active .ghbs-feed-item.ghbs-feed-green { border-left-color: var(--ghbs-success) !important; }
-body.ghbs-active .ghbs-feed-item.ghbs-feed-blue { border-left-color: var(--ghbs-info) !important; }
-body.ghbs-active .ghbs-feed-item.ghbs-feed-purple { border-left-color: var(--ghbs-purple) !important; }
-body.ghbs-active .ghbs-feed-item.ghbs-feed-yellow { border-left-color: var(--ghbs-accent) !important; }
-body.ghbs-active .ghbs-feed-item.ghbs-feed-red { border-left-color: var(--ghbs-danger) !important; }
-
-/* Badge pinned to the top-right corner, out of GitHub's flex flow. */
-body.ghbs-active .ghbs-feed-item > .ghbs-badge {
-  position: absolute !important;
-  top: 12px !important;
-  right: 12px !important;
-  margin: 0 !important;
-  z-index: 1 !important;
 }
 
 body.ghbs-active .ghbs-feed-item .title {
