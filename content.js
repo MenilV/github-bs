@@ -401,6 +401,63 @@
     `);
   }
 
+  function findChangelogContainer() {
+    const header = Array.from(document.querySelectorAll('h2, h3, [data-content="Latest from our changelog"], .f5.text-bold'))
+      .find(el => el.textContent.includes('Latest from our changelog') || el.textContent.includes('Najnovije iz dnevnika promjena'));
+    if (!header) return null;
+    return header.closest('.Box, .Box-row, [data-testid="changelog-container"]') || header.parentElement;
+  }
+
+  // Dock the Status box and Trending widget beneath the right-rail changelog.
+  // The Trending widget always follows the Status box, wherever it lands. The
+  // sidebar fallback is only used when `allowSidebarFallback` is true, which is
+  // the grace-timer's last resort if the changelog never renders.
+  let sidebarFallbackTimer = null;
+  function injectSidePanels(allowSidebarFallback) {
+    let statusPlaced = !!document.querySelector('.ghbs-status-box');
+
+    if (!statusPlaced) {
+      const changelog = findChangelogContainer();
+      if (changelog && changelog.parentNode) {
+        const statusBox = buildStatusBox();
+        statusBox.style.marginTop = '16px';
+        changelog.parentNode.insertBefore(statusBox, changelog.nextSibling);
+        statusPlaced = true;
+        log('Status box docked beneath changelog');
+      } else if (allowSidebarFallback) {
+        const sidebarWidgets = document.querySelector('.ghbs-sidebar-widgets');
+        if (sidebarWidgets) {
+          sidebarWidgets.appendChild(buildStatusBox());
+          statusPlaced = true;
+          log('Status box fell back to left sidebar (no changelog anchor)');
+        }
+      }
+    }
+
+    // Trending follows the Status box into whichever column it landed in.
+    if (statusPlaced && !document.querySelector('.ghbs-trending-widget')) {
+      const statusBox = document.querySelector('.ghbs-status-box');
+      if (statusBox && statusBox.parentNode) {
+        const trendingWidget = buildTrendingWidget();
+        // Sidebar provides its own gap; the right rail needs explicit spacing.
+        if (!statusBox.parentNode.classList.contains('ghbs-sidebar-widgets')) {
+          trendingWidget.style.marginTop = '16px';
+        }
+        statusBox.parentNode.insertBefore(trendingWidget, statusBox.nextSibling);
+        log('Trending widget docked beneath status box');
+      }
+    }
+
+    // Changelog not here yet — arm a one-shot timer that drops the widgets into
+    // the sidebar only if it still hasn't rendered after a grace period.
+    if (!statusPlaced && !allowSidebarFallback && !sidebarFallbackTimer) {
+      sidebarFallbackTimer = setTimeout(() => {
+        sidebarFallbackTimer = null;
+        injectSidePanels(true);
+      }, 3000);
+    }
+  }
+
   function injectWidgets() {
     const sidebar = document.querySelector('.dashboard-sidebar, [data-testid="dashboard-sidebar"]');
     const newsFeed = document.querySelector('.news, [data-testid="dashboard-feed"]');
@@ -437,55 +494,12 @@
       newsFeed.prepend(feedContainer);
     }
 
-    // --- Right Column Status Injection (beneath changelog) ---
-    // Primary anchor is the right-rail changelog panel. GitHub drops that panel
-    // on narrower widths / layout changes, so when it's missing we relocate the
-    // widget into the left sidebar instead of letting it silently disappear.
-    if (!document.querySelector('.ghbs-status-box')) {
-      const changelogHeader = Array.from(document.querySelectorAll('h2, h3, [data-content="Latest from our changelog"], .f5.text-bold'))
-        .find(el => el.textContent.includes('Latest from our changelog') || el.textContent.includes('Najnovije iz dnevnika promjena'));
-      const changelogContainer = changelogHeader
-        && (changelogHeader.closest('.Box, .Box-row, [data-testid="changelog-container"]') || changelogHeader.parentElement);
-
-      if (changelogContainer && changelogContainer.parentNode) {
-        const statusBox = buildStatusBox();
-        statusBox.style.marginTop = '16px';
-        changelogContainer.parentNode.insertBefore(statusBox, changelogContainer.nextSibling);
-        log('Status box injected beneath changelog');
-      } else {
-        // No right rail — fall back to the left sidebar so it stays visible.
-        const sidebarWidgets = document.querySelector('.ghbs-sidebar-widgets');
-        if (sidebarWidgets) {
-          sidebarWidgets.appendChild(buildStatusBox());
-          log('Status box fell back to left sidebar (no changelog anchor)');
-        }
-      }
-    }
-
-    // --- Right Column Trending Injection (beneath status box) ---
-    if (!document.querySelector('.ghbs-trending-widget')) {
-      const statusBox = document.querySelector('.ghbs-status-box');
-      if (statusBox && statusBox.parentNode) {
-        const trendingWidget = buildTrendingWidget();
-        trendingWidget.style.marginTop = '16px';
-        statusBox.parentNode.insertBefore(trendingWidget, statusBox.nextSibling);
-        log('Trending widget injected beneath status box');
-      } else {
-        // Fallback: if statusBox is not found, try to inject beneath changelog
-        const changelogHeader = Array.from(document.querySelectorAll('h2, h3, [data-content="Latest from our changelog"], .f5.text-bold'))
-          .find(el => el.textContent.includes('Latest from our changelog') || el.textContent.includes('Najnovije iz dnevnika promjena'));
-        
-        if (changelogHeader) {
-          const container = changelogHeader.closest('.Box, .Box-row, [data-testid="changelog-container"]') || changelogHeader.parentElement;
-          if (container && container.parentNode) {
-            const trendingWidget = buildTrendingWidget();
-            trendingWidget.style.marginTop = '16px';
-            container.parentNode.insertBefore(trendingWidget, container.nextSibling);
-            log('Trending widget injected beneath changelog (status box fallback)');
-          }
-        }
-      }
-    }
+    // --- Right Column: Status + Trending (beneath the changelog) ---
+    // Prefer the right-rail changelog anchor. Don't fall back to the sidebar on
+    // this pass — the changelog renders after our first injection, so a mutation
+    // re-scan will dock these on the right once it appears. The sidebar fallback
+    // only fires from a grace timer, if the changelog never shows at all.
+    injectSidePanels(false);
 
     // --- Footer Injection ---
     if (!document.querySelector('.ghbs-footer')) {
