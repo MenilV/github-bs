@@ -386,6 +386,148 @@ body.ghbs-active .ghbs-welcome-subtitle {
   margin: 0;
 }
 
+/* ── Victory Banner (BiH 3:1 Katar) ── */
+
+body.ghbs-active .ghbs-victory-banner {
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: relative !important;
+  border: 1px solid var(--ghbs-accent) !important;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(0, 35, 149, 0.35), transparent 55%),
+    radial-gradient(120% 140% at 100% 100%, rgba(245, 158, 11, 0.18), transparent 55%),
+    var(--ghbs-surface) !important;
+  box-shadow: var(--ghbs-shadow), 0 0 18px rgba(245, 158, 11, 0.12) !important;
+  animation: ghbs-tada 1100ms ease both !important;
+}
+
+body.ghbs-active .ghbs-victory-accent {
+  height: 4px !important;
+  background: linear-gradient(90deg, #002395, #FECB00, #ffffff, #FECB00, #002395) !important;
+  background-size: 200% 100% !important;
+  animation: ghbs-victory-shimmer 3s linear infinite !important;
+}
+
+body.ghbs-active .ghbs-victory-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 16px 20px !important;
+}
+
+body.ghbs-active .ghbs-victory-trophy {
+  font-size: 40px !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  transform-origin: center !important;
+  animation: ghbs-tada 1600ms ease-in-out 1100ms infinite !important;
+}
+
+body.ghbs-active .ghbs-victory-text {
+  min-width: 0 !important;
+}
+
+body.ghbs-active .ghbs-victory-title {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  color: var(--ghbs-accent-light) !important;
+  margin: 0 0 6px !important;
+}
+
+body.ghbs-active .ghbs-victory-score {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: var(--ghbs-text) !important;
+  margin-bottom: 6px !important;
+}
+
+body.ghbs-active .ghbs-victory-team {
+  white-space: nowrap !important;
+}
+
+body.ghbs-active .ghbs-victory-num {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 26px !important;
+  height: 26px !important;
+  padding: 0 6px !important;
+  border-radius: var(--ghbs-radius-sm) !important;
+  background: var(--ghbs-surface-alt) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+body.ghbs-active .ghbs-victory-num-win {
+  background: var(--ghbs-accent) !important;
+  color: #1a1205 !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.45) !important;
+}
+
+body.ghbs-active .ghbs-victory-dash {
+  color: var(--ghbs-text-dim) !important;
+}
+
+body.ghbs-active .ghbs-victory-subtitle {
+  font-size: 13px !important;
+  color: var(--ghbs-text-muted) !important;
+  margin: 0 !important;
+}
+
+@keyframes ghbs-victory-shimmer {
+  from { background-position: 0% 0; }
+  to { background-position: 200% 0; }
+}
+
+@keyframes ghbs-tada {
+  0% { transform: scale3d(1, 1, 1); }
+  10%, 20% { transform: scale3d(0.9, 0.9, 0.9) rotate(-3deg); }
+  30%, 50%, 70%, 90% { transform: scale3d(1.1, 1.1, 1.1) rotate(3deg); }
+  40%, 60%, 80% { transform: scale3d(1.1, 1.1, 1.1) rotate(-3deg); }
+  100% { transform: scale3d(1, 1, 1); }
+}
+
+/* ── Confetti burst ── */
+
+body.ghbs-active .ghbs-confetti-container {
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 2147483647 !important;
+  overflow: hidden !important;
+}
+
+body.ghbs-active .ghbs-confetti-piece {
+  position: absolute !important;
+  top: -12vh !important;
+  border-radius: 1px !important;
+  will-change: transform, opacity !important;
+  animation-name: ghbs-confetti-fall !important;
+  animation-timing-function: cubic-bezier(0.4, 0.1, 0.6, 1) !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: forwards !important;
+}
+
+@keyframes ghbs-confetti-fall {
+  0% { transform: translateY(0) rotateZ(0deg) rotateX(0deg); opacity: 1; }
+  100% { transform: translateY(118vh) rotateZ(720deg) rotateX(360deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.ghbs-active .ghbs-victory-banner,
+  body.ghbs-active .ghbs-victory-trophy,
+  body.ghbs-active .ghbs-victory-accent,
+  body.ghbs-active .ghbs-confetti-piece {
+    animation: none !important;
+  }
+  body.ghbs-active .ghbs-confetti-container {
+    display: none !important;
+  }
+}
+
 /* ── Chart Widget ── */
 
 body.ghbs-active .ghbs-chart-body {
@@ -644,10 +786,14 @@ body.ghbs-active .ghbs-badge-yellow {
 /* ── Feed Items ── */
 
 body.ghbs-active .ghbs-feed-item {
+  position: relative !important;
   background: var(--ghbs-surface) !important;
   border: 1px solid var(--ghbs-border) !important;
+  border-left: 3px solid var(--ghbs-border-light) !important;
   border-radius: var(--ghbs-radius);
   padding: 12px 14px !important;
+  /* Reserve room on the right so item content never runs under the badge. */
+  padding-right: 84px !important;
   margin-bottom: 8px !important;
   box-shadow: var(--ghbs-shadow);
   transition: box-shadow var(--ghbs-transition), border-color var(--ghbs-transition);
@@ -656,6 +802,22 @@ body.ghbs-active .ghbs-feed-item {
 body.ghbs-active .ghbs-feed-item:hover {
   border-color: var(--ghbs-border-light) !important;
   box-shadow: var(--ghbs-shadow-lg);
+}
+
+/* Color-coded left accent keyed to the activity type. */
+body.ghbs-active .ghbs-feed-item.ghbs-feed-green { border-left-color: var(--ghbs-success) !important; }
+body.ghbs-active .ghbs-feed-item.ghbs-feed-blue { border-left-color: var(--ghbs-info) !important; }
+body.ghbs-active .ghbs-feed-item.ghbs-feed-purple { border-left-color: var(--ghbs-purple) !important; }
+body.ghbs-active .ghbs-feed-item.ghbs-feed-yellow { border-left-color: var(--ghbs-accent) !important; }
+body.ghbs-active .ghbs-feed-item.ghbs-feed-red { border-left-color: var(--ghbs-danger) !important; }
+
+/* Badge pinned to the top-right corner, out of GitHub's flex flow. */
+body.ghbs-active .ghbs-feed-item > .ghbs-badge {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  margin: 0 !important;
+  z-index: 1 !important;
 }
 
 body.ghbs-active .ghbs-feed-item .title {

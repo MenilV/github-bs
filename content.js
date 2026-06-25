@@ -7,6 +7,12 @@
 
   const GHBS_CLASS = 'ghbs-active';
 
+  // World Cup victory banner (BiH 3:1 Katar) — shows until the cutoff date,
+  // then hides itself automatically. Month is 0-indexed, so 6 = July.
+  // Currently set to hide from 2 July 2026 onward.
+  const VICTORY_CUTOFF = new Date(2026, 6, 2, 0, 0, 0);
+  const isVictoryActive = () => new Date() < VICTORY_CUTOFF;
+
   const BOSNIAN_QUOTES = [
     'Polako se daleko stiže.',
     'Ko rano rani, dvije sreće grabi.',
@@ -154,6 +160,50 @@
         <p class="ghbs-welcome-subtitle">Spremni za novi dan kodiranja? 🚀</p>
       </div>
     `);
+  }
+
+  function buildVictoryBanner() {
+    return el('div', 'ghbs-card ghbs-victory-banner', `
+      <div class="ghbs-victory-accent"></div>
+      <div class="ghbs-victory-content">
+        <div class="ghbs-victory-trophy">🏆</div>
+        <div class="ghbs-victory-text">
+          <h2 class="ghbs-victory-title">ZMAJEVI SLAVE! 🇧🇦</h2>
+          <div class="ghbs-victory-score">
+            <span class="ghbs-victory-team">🇧🇦 BiH</span>
+            <span class="ghbs-victory-num ghbs-victory-num-win">3</span>
+            <span class="ghbs-victory-dash">:</span>
+            <span class="ghbs-victory-num">1</span>
+            <span class="ghbs-victory-team">Katar 🇶🇦</span>
+          </div>
+          <p class="ghbs-victory-subtitle">Svjetsko prvenstvo — idemo dalje, ko nas može zaustaviti! ⚽🔥</p>
+        </div>
+      </div>
+    `);
+  }
+
+  let confettiLaunched = false;
+  function launchConfetti() {
+    if (confettiLaunched || document.querySelector('.ghbs-confetti-container')) return;
+    confettiLaunched = true;
+
+    const colors = ['#002395', '#FECB00', '#ffffff', '#f59e0b', '#22c55e'];
+    const container = el('div', 'ghbs-confetti-container');
+    const pieces = 80;
+    for (let i = 0; i < pieces; i++) {
+      const piece = el('span', 'ghbs-confetti-piece');
+      piece.style.left = (Math.random() * 100) + 'vw';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = (Math.random() * 1.2) + 's';
+      piece.style.animationDuration = (2.6 + Math.random() * 1.8) + 's';
+      piece.style.width = (5 + Math.random() * 6) + 'px';
+      piece.style.height = (8 + Math.random() * 8) + 'px';
+      piece.style.opacity = (0.7 + Math.random() * 0.3).toFixed(2);
+      container.appendChild(piece);
+    }
+    document.body.appendChild(container);
+    setTimeout(() => container.remove(), 6000);
+    log('Confetti launched — BiH 3:1 Katar! 🇧🇦');
   }
 
   function buildChartWidget() {
@@ -373,7 +423,10 @@
     // --- Main Feed Injection (Welcome, Weather, Proverbs, Sticky Note) ---
     if (newsFeed && !document.querySelector('.ghbs-feed-widgets')) {
       const feedContainer = el('div', 'ghbs-feed-widgets');
+      const victoryActive = isVictoryActive();
+      if (victoryActive) feedContainer.appendChild(buildVictoryBanner());
       feedContainer.appendChild(buildWelcomeBanner());
+      if (victoryActive) launchConfetti();
 
       const topGrid = el('div', 'ghbs-widgets-grid');
       topGrid.appendChild(buildWeatherWidget());
@@ -596,7 +649,6 @@
 
     newsItems.forEach((item) => {
       if (item.classList.contains('ghbs-enhanced')) return;
-      item.classList.add('ghbs-enhanced', 'ghbs-feed-item');
 
       const classes = item.className;
       let badgeType = 'blue';
@@ -613,12 +665,14 @@
       else if (classes.includes('create')) { badgeType = 'green'; badgeLabel = 'Kreirano'; }
       else if (classes.includes('delete')) { badgeType = 'red'; badgeLabel = 'Obrisano'; }
 
-      const badge = el('span', `ghbs-badge ghbs-badge-${badgeType}`, badgeLabel);
-      const titleEl = item.querySelector('.title, strong, a');
-      if (titleEl && !item.querySelector('.ghbs-badge')) {
-        titleEl.parentNode?.insertBefore(badge, titleEl);
-      } else if (!item.querySelector('.ghbs-badge')) {
-        item.prepend(badge);
+      item.classList.add('ghbs-enhanced', 'ghbs-feed-item', `ghbs-feed-${badgeType}`);
+
+      // The badge is positioned absolutely (top-right) via CSS, so it can be
+      // appended anywhere without disturbing GitHub's own flex layout. We avoid
+      // inserting it before a guessed title node, which previously landed the
+      // badge in front of the actor avatar and broke alignment.
+      if (!item.querySelector('.ghbs-badge')) {
+        item.appendChild(el('span', `ghbs-badge ghbs-badge-${badgeType}`, badgeLabel));
       }
 
       const time = item.querySelector('relative-time, time');
@@ -778,19 +832,20 @@
       applySkin();
     });
 
+    // Coalesce mutation bursts (including the extension's own injected nodes)
+    // into a single pass per frame to avoid layout thrash and self-triggering.
+    let updateScheduled = false;
     const observer = new MutationObserver((mutations) => {
-      let needsUpdate = false;
-      for (const m of mutations) {
-        if (m.addedNodes.length > 0) {
-          needsUpdate = true;
-          break;
-        }
-      }
-      if (needsUpdate) {
+      if (updateScheduled) return;
+      const hasAddedNodes = mutations.some((m) => m.addedNodes.length > 0);
+      if (!hasAddedNodes) return;
+      updateScheduled = true;
+      requestAnimationFrame(() => {
+        updateScheduled = false;
         scanAndInject();
         localizeUI();
         enhanceActivityFeed();
-      }
+      });
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
